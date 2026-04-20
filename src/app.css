@@ -94,6 +94,115 @@
 html, body {
 	background: var(--color-base-100);
 	color: var(--color-base-content);
+	scroll-behavior: smooth;
+}
+
+/* Scroll-reveal — общая анимация появления блоков */
+.reveal {
+	opacity: 0;
+	transform: translateY(24px);
+	transition: opacity 0.9s cubic-bezier(0.2, 0.6, 0.2, 1),
+		transform 0.9s cubic-bezier(0.2, 0.6, 0.2, 1);
+	will-change: opacity, transform;
+}
+.revealed {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Hover underline для ссылок */
+@layer utilities {
+	.link-underline {
+		position: relative;
+		padding-bottom: 1px;
+	}
+	.link-underline::after {
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 1px;
+		background: currentColor;
+		transform: scaleX(0);
+		transform-origin: right center;
+		transition: transform 0.4s cubic-bezier(0.2, 0.6, 0.2, 1);
+	}
+	.link-underline:hover::after {
+		transform: scaleX(1);
+		transform-origin: left center;
+	}
+
+	/* Сияющий CTA — лёгкий ambient glow */
+	.btn-glow {
+		position: relative;
+		overflow: hidden;
+		isolation: isolate;
+	}
+	.btn-glow::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			110deg,
+			transparent 30%,
+			rgba(255, 255, 255, 0.14) 50%,
+			transparent 70%
+		);
+		transform: translateX(-120%);
+		transition: transform 0.8s ease;
+		z-index: -1;
+	}
+	.btn-glow:hover::before {
+		transform: translateX(120%);
+	}
+
+	/* Pulse для точек в архитектуре */
+	.pulse-dot {
+		animation: pulse-soft 2.2s ease-in-out infinite;
+	}
+	@keyframes pulse-soft {
+		0%, 100% { opacity: 1; transform: scale(1); }
+		50% { opacity: 0.55; transform: scale(0.88); }
+	}
+
+	/* Мерцающий дыхающий cursor для typing */
+	.typing-cursor::after {
+		content: "▍";
+		display: inline-block;
+		color: var(--color-accent);
+		animation: blink 1s step-end infinite;
+		margin-left: 2px;
+	}
+	@keyframes blink {
+		0%, 50% { opacity: 1; }
+		50.01%, 100% { opacity: 0; }
+	}
+
+	/* Моделируем dotted leader который "рисуется" */
+	.dotted-draw {
+		background-image: radial-gradient(circle, currentColor 0.8px, transparent 0.8px);
+		background-size: 6px 100%;
+		background-repeat: repeat-x;
+		background-position: 0 center;
+		animation: dotted-draw 1.2s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+	}
+	@keyframes dotted-draw {
+		from { background-size: 0 100%; }
+		to { background-size: 6px 100%; }
+	}
+}
+
+/* На мобильных отключаем тяжёлый scroll-behaviour при reduced motion */
+@media (prefers-reduced-motion: reduce) {
+	* {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+	.reveal {
+		opacity: 1;
+		transform: none;
+	}
 }
 
 * {

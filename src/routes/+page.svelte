@@ -1,4 +1,14 @@
 <script>
+	// ────────────────────────────────────────────────────────────
+	// ВАЖНО: состояние пилотных мест. Обновлять руками при продаже.
+	// Когда пилот занят — PILOTS_TAKEN++, состояние сразу на сайте.
+	// Также меняет цифру в блоке «Первые пилоты» в hero.
+	// ────────────────────────────────────────────────────────────
+	const PILOTS_TOTAL = 3;
+	const PILOTS_TAKEN = 0;
+	const pilotsFree = PILOTS_TOTAL - PILOTS_TAKEN;
+	const pilotRoman = ["I", "II", "III"];
+
 	const today = new Date();
 	const monthsRoman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
 	const dateStr = `${String(today.getDate()).padStart(2, "0")} · ${monthsRoman[today.getMonth()]} · ${today.getFullYear()}`;
@@ -10,7 +20,7 @@
 		["03", "Языков ввода", "12"],
 		["04", "Себестоимость диалога", "~ 3 ₽"],
 		["05", "Клиентских кейсов", "0 · пока"],
-		["06", "Первые пилоты", "3 места"]
+		["06", "Свободных пилотов", `${pilotsFree} из ${PILOTS_TOTAL}`]
 	];
 
 	const method = [
@@ -140,7 +150,7 @@
 		<span>Четыре хода</span>
 	</div>
 	<div class="grid grid-cols-1 md:grid-cols-4 gap-0 mt-8">
-		{#each method as [n, title, desc], i (n)}
+		{#each method as [n, title, desc] (n)}
 			<div class="px-0 md:px-6 py-6 md:py-0 md:border-r border-b md:border-b-0 border-base-content/20 last:border-b-0 md:last:border-r-0 first:pl-0 last:md:pr-0">
 				<div class="font-mono tabular text-[11px] text-accent tracking-[0.16em]">№ {n}</div>
 				<h3 class="font-display italic text-2xl md:text-[26px] font-medium text-base-content mt-2.5 mb-3.5 leading-[1.1]">{title}</h3>
@@ -251,8 +261,41 @@
 			<span class="text-primary">начинается с письма.</span>
 		</h2>
 		<p class="font-body text-base text-base-content/80 mt-5 max-w-lg leading-relaxed">
-			Первые 3 ресторана — бесплатно. Я собираю каталог меню сам, настраиваю QR-коды, передаю ключ от кухни в Telegram.
+			Первые три пилотных места — бесплатно. Я собираю каталог меню сам, настраиваю QR-коды, передаю ключ от кухни в Telegram.
 		</p>
+
+		<!-- Индикатор свободных пилотных мест -->
+		<div class="mt-8 border border-base-content/30 bg-base-200/60 backdrop-blur-sm">
+			<div class="px-5 py-3 flex items-center justify-between border-b border-base-content/25 masthead">
+				<span>№ пилотных мест</span>
+				<span class="text-accent">{pilotsFree} из {PILOTS_TOTAL} свободно</span>
+			</div>
+			<div class="grid grid-cols-3 gap-0">
+				{#each pilotRoman as roman, i (roman)}
+					{@const taken = i < PILOTS_TAKEN}
+					<div class="p-5 border-r last:border-r-0 border-base-content/20 text-center {taken ? 'bg-primary text-primary-content' : 'bg-transparent'}">
+						<div class="font-mono tabular text-[10px] tracking-[0.2em] {taken ? 'opacity-80' : 'text-accent'}">
+							ПИЛОТ № {roman}
+						</div>
+						<div class="font-display italic text-3xl font-medium mt-1.5 leading-none">
+							{taken ? "Занят" : "Свободен"}
+						</div>
+						<div class="font-mono tabular text-[10px] tracking-[0.14em] mt-2 {taken ? 'opacity-70' : 'text-base-content/55'}">
+							{taken ? "— настройка идёт" : "0 ₽ · 14 дней"}
+						</div>
+					</div>
+				{/each}
+			</div>
+			{#if pilotsFree > 0}
+				<div class="px-5 py-3 border-t border-base-content/25 font-display italic text-sm text-base-content/70 leading-snug">
+					Когда все три займутся — тариф «Кафе» от 9 900 ₽/мес, без пилотной скидки.
+				</div>
+			{:else}
+				<div class="px-5 py-3 border-t border-base-content/25 font-display italic text-sm text-error leading-snug">
+					Все пилотные места заняты. Пишите — поставлю в очередь на платный запуск по тарифу «Кафе».
+				</div>
+			{/if}
+		</div>
 
 		<div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-0 border-y border-base-content/30">
 			<a href="https://t.me/tablemind" target="_blank" rel="noopener" class="flex items-baseline gap-3 py-5 px-2 border-b sm:border-b-0 sm:border-r border-base-content/25 hover:bg-base-200 transition-colors">
