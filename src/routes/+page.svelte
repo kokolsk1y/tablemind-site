@@ -715,9 +715,7 @@
 						</div>
 						<div class="masthead mt-2">разработчик · автор · TableMind</div>
 					</div>
-					<div class="w-14 h-14 border border-base-content rounded-full flex items-center justify-center">
-						<span class="font-display italic text-xl text-base-content leading-none">T</span>
-					</div>
+					<img src="/logo.png" alt="TableMind" class="w-16 h-16 object-contain" />
 				</div>
 			</aside>
 		</div>
