@@ -95,6 +95,8 @@
 		<img
 			src="/logo.png"
 			alt="TableMind — AI-официант"
+			width="64"
+			height="64"
 			class="w-14 h-14 md:w-16 md:h-16 object-contain transition-transform duration-500 group-hover:scale-[1.06]"
 			style="mix-blend-mode: multiply;"
 		/>
@@ -121,7 +123,7 @@
 <!-- Hero — single focus, full-bleed photo, cinema -->
 <section
 	class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden flex flex-col justify-end bg-base-100"
-	style="background-image: linear-gradient(rgba(242,234,218,1) 0%, rgba(242,234,218,1) 140px, rgba(242,234,218,0.82) 45%, rgba(242,234,218,0.75) 100%), url('/bg/hero.png'); background-size: cover; background-position: center;"
+	style="background-image: linear-gradient(rgba(242,234,218,1) 0%, rgba(242,234,218,1) 140px, rgba(242,234,218,0.82) 45%, rgba(242,234,218,0.75) 100%), url('/bg/hero.webp'); background-size: cover; background-position: center;"
 	use:parallaxBg={{ factor: 0.35 }}
 >
 	<!-- Oversized folio numeral -->
@@ -293,7 +295,7 @@
 						<h3 class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-[1.05]">
 							{title}
 						</h3>
-						<p class="font-body text-sm md:text-base text-base-content/75 leading-relaxed mt-4 max-w-sm">
+						<p class="font-body text-[15px] md:text-base text-base-content/80 leading-relaxed mt-4 max-w-sm">
 							{desc}
 						</p>
 					</div>
@@ -357,7 +359,7 @@
 							</div>
 
 							<!-- Descriptive copy per step -->
-							<div class="font-body text-sm text-base-content/80 leading-relaxed">
+							<div class="font-body text-[15px] md:text-base text-base-content/85 leading-relaxed">
 								{#if i === 0}
 									Гость подходит к столу и видит QR. Сканирует камерой — открывается веб-приложение. Устанавливать ничего не нужно, аккаунтов нет.
 								{:else if i === 1}
@@ -502,7 +504,7 @@
 				<!-- Атмосферный плейт-шот -->
 				<div class="border border-base-content/25 overflow-hidden" use:reveal={{ delay: 120 }}>
 					<img
-						src="/bg/plate.png"
+						src="/bg/plate.webp"
 						alt="Свёкольное карпаччо с козьим сыром"
 						class="w-full h-64 md:h-80 object-cover"
 						loading="lazy"
@@ -588,9 +590,9 @@
 					<!-- Верхняя линия-акцент появляется плавно при hover — равноправно для всех -->
 					<div class="absolute top-0 left-0 right-0 h-[3px] bg-accent transition-transform duration-500 scale-x-0 group-hover:scale-x-100" style="transform-origin: left center;"></div>
 
-					<div class="font-mono tabular text-[10px] text-accent tracking-[0.2em]">№ {p.n}</div>
+					<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">№ {p.n}</div>
 					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content mt-2 transition-transform duration-500 group-hover:translate-x-1">{p.name}</div>
-					<div class="font-display italic text-[13px] text-base-content/65 mt-1.5 leading-snug min-h-[2.6em]">{p.sub}</div>
+					<div class="font-display italic text-sm text-base-content/70 mt-2 leading-snug min-h-[2.6em]">{p.sub}</div>
 
 					<div class="flex items-baseline gap-1.5 mt-6">
 						<div class="font-mono tabular text-[44px] md:text-[52px] font-medium text-base-content leading-none">{p.price}</div>
@@ -602,8 +604,8 @@
 					<div class="border-t border-dotted border-base-content/30 my-5 md:my-6"></div>
 
 					{#each p.bullets as b (b)}
-						<div class="flex gap-2.5 py-1.5 text-[13px] md:text-sm text-base-content/80 leading-snug">
-							<span class="font-mono text-accent text-[10px] pt-1 shrink-0">·</span>
+						<div class="flex gap-2.5 py-1.5 text-sm md:text-[15px] text-base-content/85 leading-snug">
+							<span class="font-mono text-accent text-[11px] pt-1 shrink-0">·</span>
 							<span>{b}</span>
 						</div>
 					{/each}
@@ -617,7 +619,7 @@
 <section
 	id="contact"
 	class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden"
-	style="background-image: linear-gradient(rgba(242,234,218,0.94), rgba(242,234,218,0.88)), url('/bg/texture.png'); background-size: cover; background-position: center;"
+	style="background-image: linear-gradient(rgba(242,234,218,0.94), rgba(242,234,218,0.88)), url('/bg/texture.webp'); background-size: cover; background-position: center;"
 >
 	<div class="chapter-folio chapter-folio-accent" style="bottom: -18vh; right: -4vw;">VII</div>
 
@@ -709,8 +711,11 @@
 					<img
 						src="/logo.png"
 						alt="TableMind"
+						width="96"
+						height="96"
 						class="w-20 h-20 md:w-24 md:h-24 object-contain"
 						style="mix-blend-mode: multiply;"
+						loading="lazy"
 					/>
 				</div>
 			</aside>
@@ -759,8 +764,11 @@
 					<img
 						src="/logo.png"
 						alt="TableMind"
+						width="56"
+						height="56"
 						class="w-full h-full object-contain"
 						style="mix-blend-mode: multiply;"
+						loading="lazy"
 					/>
 				</div>
 				<span class="font-display italic text-2xl md:text-3xl font-semibold tracking-wide">TableMind</span>
