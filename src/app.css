@@ -194,6 +194,33 @@ html, body {
 }
 
 /* На мобильных отключаем тяжёлый scroll-behaviour при reduced motion */
+/* Animated flow line в секции архитектуры — поток данных */
+.arch-flow-line {
+	background-image: linear-gradient(
+		90deg,
+		transparent,
+		var(--color-base-content) 20%,
+		var(--color-base-content) 80%,
+		transparent
+	);
+	opacity: 0.3;
+}
+.arch-flow-line::before {
+	content: "";
+	position: absolute;
+	top: -1.5px;
+	left: 0;
+	width: 40px;
+	height: 4px;
+	background: var(--color-accent);
+	filter: blur(1px);
+	animation: arch-flow 4s linear infinite;
+}
+@keyframes arch-flow {
+	0% { left: -5%; }
+	100% { left: 100%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
 	* {
 		animation-duration: 0.01ms !important;

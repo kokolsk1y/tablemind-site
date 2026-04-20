@@ -1,4 +1,6 @@
 <script>
+	import { reveal, parallaxBg, counter, typingSequence } from "$lib/actions.js";
+
 	// ────────────────────────────────────────────────────────────
 	// ВАЖНО: состояние пилотных мест. Обновлять руками при продаже.
 	// Когда пилот занят — PILOTS_TAKEN++, состояние сразу на сайте.
@@ -9,34 +11,43 @@
 	const pilotsFree = PILOTS_TOTAL - PILOTS_TAKEN;
 	const pilotRoman = ["I", "II", "III"];
 
+	// Архитектура — как устроен продукт внутри
+	const arch = [
+		{ roman: "I", label: "Гость", desc: "QR на столе", icon: "QR" },
+		{ roman: "II", label: "PWA", desc: "меню в браузере", icon: "T" },
+		{ roman: "III", label: "AI-агент", desc: "Claude Haiku", icon: "AI" },
+		{ roman: "IV", label: "Верификатор", desc: "сверяется с картой", icon: "✓" },
+		{ roman: "V", label: "Telegram", desc: "зовёт официанта", icon: "TG" }
+	];
+
+	// Живой diálogo — раскрывается typing-анимацией
+	/** @type {string[]} */
+	let dialogueShown = $state(["", "", "", "", "", ""]);
+	const dialogueData = [
+		{ who: "guest", label: "ГОСТЬ", text: "Что-нибудь лёгкое к рислингу, без рыбы?" },
+		{ who: "ai", label: "AI · TM", text: "Есть карпаччо из свёклы с козьим сыром — № 04, 520 ₽. Также крем из тыквы с тимьяновым маслом (№ 03)." },
+		{ who: "guest", label: "ГОСТЬ", text: "А аллергены?" },
+		{ who: "ai", label: "AI · TM", text: "В карпаччо — орехи и молочное. В крем-супе — орехи. Предупрежу кухню." },
+		{ who: "guest", label: "ГОСТЬ", text: "Позови официанта" },
+		{ who: "ai", label: "AI · TM", text: "→ Отправил Илье в Telegram. Он подойдёт через 1–2 минуты." }
+	];
+	let dialogueActiveIndex = $state(-1);
+
+	function updateDialogue(i, text, complete) {
+		dialogueShown[i] = text;
+		dialogueActiveIndex = complete ? -1 : i;
+	}
+
 	const today = new Date();
 	const monthsRoman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
 	const dateStr = `${String(today.getDate()).padStart(2, "0")} · ${monthsRoman[today.getMonth()]} · ${today.getFullYear()}`;
 	const issueNum = String(today.getDate() + today.getMonth() * 31).padStart(3, "0");
-
-	const metrics = [
-		["01", "Средний ответ AI", "< 1.4 с"],
-		["02", "Точность верификатора", "97 %"],
-		["03", "Языков ввода", "12"],
-		["04", "Себестоимость диалога", "~ 3 ₽"],
-		["05", "Клиентских кейсов", "0 · пока"],
-		["06", "Свободных пилотов", `${pilotsFree} из ${PILOTS_TOTAL}`]
-	];
 
 	const method = [
 		["I", "QR на столе", "Гость открывает PWA за <2 сек. Никаких установок, никаких аккаунтов."],
 		["II", "Разговор", "Голосом или текстом, на русском или своём. AI знает меню шефа наизусть."],
 		["III", "Верификатор", "Прежде чем ответить — сверяется с картой. Не придумает того, чего нет."],
 		["IV", "Живой официант", "Если нужно — зовёт человека в ваш Telegram со столом и контекстом."]
-	];
-
-	const dialogue = [
-		["guest", "ГОСТЬ", "Что-нибудь лёгкое к рислингу, без рыбы?"],
-		["ai", "AI · TM", "Есть карпаччо из свёклы с козьим сыром — № 04, 520 ₽. Также мог бы порекомендовать крем из тыквы с тимьяновым маслом (№ 03)."],
-		["guest", "ГОСТЬ", "А аллергены?"],
-		["ai", "AI · TM", "В карпаччо — орехи и молочное. В крем-супе — орехи. Предупрежу кухню, если решите."],
-		["guest", "ГОСТЬ", "Позови официанта"],
-		["ai", "AI · TM", "→ Отправил Илье в Telegram. Он подойдёт через 1–2 минуты."]
 	];
 
 	const tariffs = [
@@ -100,43 +111,100 @@
 <section
 	class="relative px-6 py-12 md:py-20 md:grid md:grid-cols-[1.3fr_1fr] md:gap-16 border-b border-base-content/20 overflow-hidden"
 	style="background-image: linear-gradient(rgba(242,234,218,0.92), rgba(242,234,218,0.82)), url('/bg/hero.png'); background-size: cover; background-position: center;"
+	use:parallaxBg={{ factor: 0.35 }}
 >
 	<div class="relative">
-		<div class="eyebrow mb-5">№ 01 · Закуска</div>
-		<h1 class="font-display font-medium text-base-content leading-[0.95]" style="font-size: clamp(48px, 10vw, 108px); letter-spacing: -0.025em;">
+		<div class="eyebrow mb-5" use:reveal>№ 01 · Закуска</div>
+		<h1
+			class="font-display font-medium text-base-content leading-[0.95]"
+			style="font-size: clamp(48px, 10vw, 108px); letter-spacing: -0.025em;"
+			use:reveal={{ delay: 100 }}
+		>
 			<span class="italic">AI-официант,</span><br />
 			который<br />
 			<span class="text-primary">знает ваше меню.</span>
 		</h1>
-		<div class="h-px bg-base-content/25 my-8 md:my-10 w-3/4"></div>
-		<p class="font-body text-base md:text-lg text-base-content/80 max-w-lg leading-relaxed">
+		<div class="h-px bg-base-content/25 my-8 md:my-10 w-3/4" use:reveal={{ delay: 250 }}></div>
+		<p
+			class="font-body text-base md:text-lg text-base-content/80 max-w-lg leading-relaxed"
+			use:reveal={{ delay: 350 }}
+		>
 			Гость сканирует QR со стола — и получает собеседника, который рассказывает о блюдах голосом и текстом, подбирает комплексы, зовёт живого официанта в Telegram, если нужно.
 		</p>
-		<div class="flex flex-wrap gap-3 mt-8">
-			<a href="#contact" class="bg-primary text-primary-content font-body font-semibold text-sm py-4 px-6 flex items-center gap-2.5 hover:bg-base-content transition-colors">
+		<div class="flex flex-wrap gap-3 mt-8" use:reveal={{ delay: 500 }}>
+			<a
+				href="#contact"
+				class="btn-glow bg-primary text-primary-content font-body font-semibold text-sm py-4 px-6 flex items-center gap-2.5 hover:bg-base-content transition-colors"
+			>
 				<span class="font-mono tabular text-[11px] opacity-70">№ →</span>
 				<span>Записаться на пилот</span>
 			</a>
-			<a href="#method" class="border-[1.5px] border-base-content text-base-content font-body font-medium text-sm py-4 px-6 hover:bg-base-content/10 transition-colors">
+			<a
+				href="#method"
+				class="border-[1.5px] border-base-content text-base-content font-body font-medium text-sm py-4 px-6 hover:bg-base-content/10 transition-colors link-underline"
+			>
 				Смотреть метод
 			</a>
 		</div>
 	</div>
 
 	<!-- Numbers that matter -->
-	<div class="relative mt-16 md:mt-0">
+	<div class="relative mt-16 md:mt-0" use:reveal={{ delay: 150 }}>
 		<div class="flex items-center justify-between pb-2 border-b border-base-content/25 masthead">
 			<span>Цифры, которые важны</span>
 			<span>№ — ЗНАЧ</span>
 		</div>
-		{#each metrics as [n, label, value] (n)}
-			<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
-				<div class="font-mono tabular text-[11px] text-accent w-8">{n}</div>
-				<div class="font-body text-[15px] text-base-content font-medium">{label}</div>
-				<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
-				<div class="font-mono tabular text-[15px] text-base-content font-medium">{value}</div>
+		<!-- Счётчик: средний ответ AI -->
+		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
+			<div class="font-mono tabular text-[11px] text-accent w-8">01</div>
+			<div class="font-body text-[15px] text-base-content font-medium">Средний ответ AI</div>
+			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
+			<div class="font-mono tabular text-[15px] text-base-content font-medium">
+				&lt;&nbsp;<span use:counter={{ target: 1.4, duration: 1400, decimals: 1 }}>0.0</span>&nbsp;с
 			</div>
-		{/each}
+		</div>
+		<!-- Счётчик: точность -->
+		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
+			<div class="font-mono tabular text-[11px] text-accent w-8">02</div>
+			<div class="font-body text-[15px] text-base-content font-medium">Точность верификатора</div>
+			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
+			<div class="font-mono tabular text-[15px] text-base-content font-medium">
+				<span use:counter={{ target: 97, duration: 1400 }}>0</span>&nbsp;%
+			</div>
+		</div>
+		<!-- Счётчик: языков -->
+		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
+			<div class="font-mono tabular text-[11px] text-accent w-8">03</div>
+			<div class="font-body text-[15px] text-base-content font-medium">Языков ввода</div>
+			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
+			<div class="font-mono tabular text-[15px] text-base-content font-medium">
+				<span use:counter={{ target: 12, duration: 1400 }}>0</span>
+			</div>
+		</div>
+		<!-- Счётчик: себестоимость -->
+		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
+			<div class="font-mono tabular text-[11px] text-accent w-8">04</div>
+			<div class="font-body text-[15px] text-base-content font-medium">Себестоимость диалога</div>
+			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
+			<div class="font-mono tabular text-[15px] text-base-content font-medium">
+				~&nbsp;<span use:counter={{ target: 3, duration: 1400 }}>0</span>&nbsp;₽
+			</div>
+		</div>
+		<!-- Статические метрики -->
+		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
+			<div class="font-mono tabular text-[11px] text-accent w-8">05</div>
+			<div class="font-body text-[15px] text-base-content font-medium">Клиентских кейсов</div>
+			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
+			<div class="font-mono tabular text-[15px] text-base-content font-medium">0 · пока</div>
+		</div>
+		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
+			<div class="font-mono tabular text-[11px] text-accent w-8">06</div>
+			<div class="font-body text-[15px] text-base-content font-medium">Свободных пилотов</div>
+			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
+			<div class="font-mono tabular text-[15px] text-accent font-medium">
+				{pilotsFree}&nbsp;из&nbsp;{PILOTS_TOTAL}
+			</div>
+		</div>
 		<p class="font-display italic text-sm text-base-content/70 mt-5 leading-relaxed">
 			Первые три ресторана — лично, руками. Без пресейла, без агентств, без красивых слов.
 		</p>
@@ -145,18 +213,79 @@
 
 <!-- Method -->
 <section id="method" class="px-6 py-14 border-b border-base-content/20">
-	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead">
+	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead" use:reveal>
 		<span>№ 02 — МЕТОД</span>
 		<span>Четыре хода</span>
 	</div>
 	<div class="grid grid-cols-1 md:grid-cols-4 gap-0 mt-8">
-		{#each method as [n, title, desc] (n)}
-			<div class="px-0 md:px-6 py-6 md:py-0 md:border-r border-b md:border-b-0 border-base-content/20 last:border-b-0 md:last:border-r-0 first:pl-0 last:md:pr-0">
+		{#each method as [n, title, desc], i (n)}
+			<div
+				class="px-0 md:px-6 py-6 md:py-0 md:border-r border-b md:border-b-0 border-base-content/20 last:border-b-0 md:last:border-r-0 first:pl-0 last:md:pr-0"
+				use:reveal={{ delay: 150 + i * 120 }}
+			>
 				<div class="font-mono tabular text-[11px] text-accent tracking-[0.16em]">№ {n}</div>
 				<h3 class="font-display italic text-2xl md:text-[26px] font-medium text-base-content mt-2.5 mb-3.5 leading-[1.1]">{title}</h3>
 				<p class="font-body text-sm text-base-content/75 leading-relaxed">{desc}</p>
 			</div>
 		{/each}
+	</div>
+</section>
+
+<!-- Architecture (NEW) -->
+<section id="arch" class="px-6 py-14 border-b border-base-content/20 bg-base-200">
+	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead" use:reveal>
+		<span>№ 03 — АРХИТЕКТУРА</span>
+		<span>Как устроено внутри</span>
+	</div>
+
+	<!-- Flow diagram -->
+	<div class="mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-0 relative">
+		<!-- Animated flowing line между нодами на десктопе -->
+		<div
+			class="arch-flow-line hidden md:block absolute top-7 left-[10%] right-[10%] h-px pointer-events-none"
+			aria-hidden="true"
+		></div>
+
+		{#each arch as step, i (step.roman)}
+			<div
+				class="relative flex md:flex-col items-center md:items-center gap-4 md:gap-0 text-left md:text-center"
+				use:reveal={{ delay: 150 + i * 180 }}
+			>
+				<!-- Node circle -->
+				<div class="relative w-14 h-14 shrink-0 z-10 bg-base-200">
+					<div class="absolute inset-0 border-[1.5px] border-base-content rounded-full bg-base-100 flex items-center justify-center">
+						<span class="font-mono tabular text-[11px] font-semibold text-base-content tracking-wide">
+							{step.icon}
+						</span>
+					</div>
+					<!-- Pulse ring -->
+					<div class="absolute inset-0 border-[1.5px] border-accent rounded-full pulse-dot opacity-40"></div>
+				</div>
+
+				<div class="md:mt-4 flex-1 md:flex-none">
+					<div class="font-mono tabular text-[10px] text-accent tracking-[0.18em]">
+						{step.roman}
+					</div>
+					<div class="font-display italic text-xl font-medium text-base-content leading-tight mt-0.5">
+						{step.label}
+					</div>
+					<div class="font-body text-xs text-base-content/65 mt-1 leading-snug">
+						{step.desc}
+					</div>
+				</div>
+
+				<!-- Connector (mobile vertical) -->
+				{#if i < arch.length - 1}
+					<div class="md:hidden absolute left-[27px] top-14 bottom-[-32px] w-px border-l border-dotted border-base-content/40"></div>
+				{/if}
+			</div>
+		{/each}
+	</div>
+
+	<div class="mt-10 md:mt-14 font-display italic text-sm md:text-base text-base-content/75 leading-relaxed max-w-2xl" use:reveal>
+		Поток всегда один: QR открывает PWA за две секунды, AI читает JSON-каталог меню,
+		верификатор отдельной моделью сверяет каждый ответ, вызов официанта уходит в
+		ваш Telegram с номером стола и контекстом. Никаких серверов, которые нужно администрировать.
 	</div>
 </section>
 
@@ -192,34 +321,47 @@
 		</div>
 	</div>
 
-	<!-- Dialogue mockup -->
-	<div class="bg-base-200 border border-base-content/25 mt-10 md:mt-0">
+	<!-- Dialogue mockup — live typing -->
+	<div
+		class="bg-base-200 border border-base-content/25 mt-10 md:mt-0 self-start"
+		use:typingSequence={{
+			messages: dialogueData,
+			charDelay: 14,
+			delayBetween: 550,
+			onUpdate: updateDialogue
+		}}
+	>
 		<div class="px-5 py-3 border-b border-dotted border-base-content/30 flex items-center justify-between masthead">
 			<span>СТОЛ · 07</span>
 			<span>ДИАЛОГ №014</span>
 			<span>20:41</span>
 		</div>
-		{#each dialogue as [who, label, text], i (i)}
-			<div class="flex gap-4 px-5 py-3.5 {i < dialogue.length - 1 ? 'border-b border-dotted border-base-content/25' : ''}">
-				<div class="font-mono text-[9px] tracking-[0.15em] font-semibold w-12 pt-1 {who === 'ai' ? 'text-primary' : 'text-accent'}">
-					{label}
+		{#each dialogueData as msg, i (i)}
+			{#if dialogueShown[i] || i === dialogueActiveIndex}
+				<div class="flex gap-4 px-5 py-3.5 {i < dialogueData.length - 1 ? 'border-b border-dotted border-base-content/25' : ''}">
+					<div class="font-mono text-[9px] tracking-[0.15em] font-semibold w-12 pt-1 {msg.who === 'ai' ? 'text-primary' : 'text-accent'}">
+						{msg.label}
+					</div>
+					<div class="flex-1 font-body text-sm text-base-content leading-relaxed {dialogueActiveIndex === i ? 'typing-cursor' : ''}">
+						{dialogueShown[i]}
+					</div>
 				</div>
-				<div class="flex-1 font-body text-sm text-base-content leading-relaxed">{text}</div>
-			</div>
+			{/if}
 		{/each}
 	</div>
 </section>
 
 <!-- Tariffs -->
-<section id="tarif" class="px-6 py-14 border-b border-base-content/20 bg-base-200">
-	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead">
+<section id="tarif" class="px-6 py-14 border-b border-base-content/20">
+	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead" use:reveal>
 		<span>№ 04 — ТАРИФ · ЧЕСТНЫЙ СЧЁТ</span>
 		<span>₽ / месяц</span>
 	</div>
 	<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-8">
-		{#each tariffs as p (p.n)}
+		{#each tariffs as p, i (p.n)}
 			<div
-				class="relative p-7 border-b md:border-b-0 md:border-r border-base-content/20 last:border-b-0 md:last:border-r-0 {p.featured ? 'bg-base-100' : ''}"
+				class="relative p-7 border-b md:border-b-0 md:border-r border-base-content/20 last:border-b-0 md:last:border-r-0 transition-transform duration-500 hover:-translate-y-1 {p.featured ? 'bg-base-200' : ''}"
+				use:reveal={{ delay: 150 + i * 150 }}
 			>
 				{#if p.featured}
 					<div class="absolute top-0 left-0 right-0 h-[3px] bg-accent"></div>
