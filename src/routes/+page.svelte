@@ -87,8 +87,11 @@
 </div>
 
 <!-- Hero -->
-<section class="px-6 py-12 md:py-20 md:grid md:grid-cols-[1.3fr_1fr] md:gap-16 border-b border-base-content/20">
-	<div>
+<section
+	class="relative px-6 py-12 md:py-20 md:grid md:grid-cols-[1.3fr_1fr] md:gap-16 border-b border-base-content/20 overflow-hidden"
+	style="background-image: linear-gradient(rgba(242,234,218,0.92), rgba(242,234,218,0.82)), url('/bg/hero.png'); background-size: cover; background-position: center;"
+>
+	<div class="relative">
 		<div class="eyebrow mb-5">№ 01 · Закуска</div>
 		<h1 class="font-display font-medium text-base-content leading-[0.95]" style="font-size: clamp(48px, 10vw, 108px); letter-spacing: -0.025em;">
 			<span class="italic">AI-официант,</span><br />
@@ -111,7 +114,7 @@
 	</div>
 
 	<!-- Numbers that matter -->
-	<div class="mt-16 md:mt-0">
+	<div class="relative mt-16 md:mt-0">
 		<div class="flex items-center justify-between pb-2 border-b border-base-content/25 masthead">
 			<span>Цифры, которые важны</span>
 			<span>№ — ЗНАЧ</span>
@@ -129,6 +132,13 @@
 		</p>
 	</div>
 </section>
+
+<!-- Decorative gouache band -->
+<div
+	class="h-20 md:h-28 border-b border-base-content/20"
+	style="background-image: url('/bg/texture.png'); background-size: cover; background-position: center;"
+	aria-hidden="true"
+></div>
 
 <!-- Method -->
 <section id="method" class="px-6 py-14 border-b border-base-content/20">
@@ -162,6 +172,20 @@
 			<span><b class="text-base-content">97 %</b> <span class="text-base-content/60">точность</span></span>
 			<span><b class="text-base-content">0</b> <span class="text-base-content/60">галлюцинаций в логах</span></span>
 			<span><b class="text-base-content">&lt; 1.4 с</b> <span class="text-base-content/60">ответ</span></span>
+		</div>
+
+		<!-- Atmospheric plate shot -->
+		<div class="mt-8 border border-base-content/25 overflow-hidden">
+			<img
+				src="/bg/plate.png"
+				alt="Свёкольное карпаччо с козьим сыром"
+				class="w-full h-56 md:h-64 object-cover"
+				loading="lazy"
+			/>
+			<div class="px-4 py-2.5 bg-base-200 border-t border-base-content/20 flex items-center justify-between masthead">
+				<span>№ 04 · блюдо дня</span>
+				<span>Карпаччо из свёклы</span>
+			</div>
 		</div>
 	</div>
 
