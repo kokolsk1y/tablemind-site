@@ -103,9 +103,10 @@
 		<img
 			src="/logo.png"
 			alt="TableMind — AI-официант"
-			class="w-10 h-10 md:w-11 md:h-11 object-contain transition-transform duration-500 group-hover:scale-[1.06]"
+			class="w-14 h-14 md:w-16 md:h-16 object-contain transition-transform duration-500 group-hover:scale-[1.06]"
+			style="mix-blend-mode: multiply;"
 		/>
-		<span class="font-display italic text-xl font-semibold text-base-content tracking-wide hidden sm:inline">
+		<span class="font-display italic text-xl md:text-2xl font-semibold text-base-content tracking-wide hidden sm:inline">
 			TableMind
 		</span>
 	</a>
@@ -715,7 +716,12 @@
 						</div>
 						<div class="masthead mt-2">разработчик · автор · TableMind</div>
 					</div>
-					<img src="/logo.png" alt="TableMind" class="w-16 h-16 object-contain" />
+					<img
+						src="/logo.png"
+						alt="TableMind"
+						class="w-20 h-20 md:w-24 md:h-24 object-contain"
+						style="mix-blend-mode: multiply;"
+					/>
 				</div>
 			</aside>
 		</div>
