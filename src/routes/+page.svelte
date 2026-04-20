@@ -81,31 +81,52 @@
 	];
 </script>
 
-<!-- Top meta strip -->
-<div class="px-6 py-3 border-b border-base-content/20 flex items-center justify-between masthead">
-	<span>TableMind · AI-официант</span>
-	<span class="hidden sm:inline">ВЫПУСК №{issueNum} — {dateStr}</span>
-	<span>Калининград</span>
-</div>
-
-<!-- Nav -->
-<div class="px-6 py-4 border-b border-base-content/20 flex items-center justify-between gap-6">
-	<a href="/" class="flex items-center gap-2.5">
-		<span class="inline-block w-7 h-7 border border-base-content flex items-center justify-center">
-			<span class="font-display italic text-base text-base-content leading-none">T</span>
+<!-- Nav — truly centered grid с интерактивной CTA -->
+<header class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 md:gap-8 px-5 md:px-8 py-5 border-b border-base-content/20 bg-base-100">
+	<!-- Logo left -->
+	<a href="/" class="justify-self-start flex items-center gap-3 group">
+		<span class="inline-block w-8 h-8 border-[1.5px] border-base-content flex items-center justify-center transition-all group-hover:bg-base-content group-hover:text-base-100">
+			<span class="font-display italic text-lg leading-none">T</span>
 		</span>
-		<span class="font-display italic text-lg font-semibold text-base-content tracking-wide">TableMind</span>
+		<span class="font-display italic text-xl font-semibold text-base-content tracking-wide hidden sm:inline">
+			TableMind
+		</span>
 	</a>
-	<nav class="hidden md:flex gap-7 font-body font-medium text-sm">
-		<a href="#method" class="text-base-content hover:text-accent transition-colors">Метод</a>
-		<a href="#tarif" class="text-base-content hover:text-accent transition-colors">Карта цен</a>
-		<a href="#verifier" class="text-base-content hover:text-accent transition-colors">Верификатор</a>
-		<a href="#contact" class="text-base-content hover:text-accent transition-colors">Связаться</a>
+
+	<!-- Chapter-numbered nav center -->
+	<nav class="hidden md:flex gap-7 lg:gap-9 justify-self-center">
+		<a href="#method" class="group flex items-baseline gap-1.5 link-underline text-base-content hover:text-accent transition-colors">
+			<span class="font-mono tabular text-[10px] text-accent/70 group-hover:text-accent tracking-[0.15em]">I</span>
+			<span class="font-body font-medium text-sm">Метод</span>
+		</a>
+		<a href="#arch" class="group flex items-baseline gap-1.5 link-underline text-base-content hover:text-accent transition-colors">
+			<span class="font-mono tabular text-[10px] text-accent/70 group-hover:text-accent tracking-[0.15em]">II</span>
+			<span class="font-body font-medium text-sm">Архитектура</span>
+		</a>
+		<a href="#verifier" class="group flex items-baseline gap-1.5 link-underline text-base-content hover:text-accent transition-colors">
+			<span class="font-mono tabular text-[10px] text-accent/70 group-hover:text-accent tracking-[0.15em]">III</span>
+			<span class="font-body font-medium text-sm">Верификатор</span>
+		</a>
+		<a href="#tarif" class="group flex items-baseline gap-1.5 link-underline text-base-content hover:text-accent transition-colors">
+			<span class="font-mono tabular text-[10px] text-accent/70 group-hover:text-accent tracking-[0.15em]">IV</span>
+			<span class="font-body font-medium text-sm">Тариф</span>
+		</a>
 	</nav>
-	<a href="#contact" class="bg-base-content text-base-100 px-4 py-2.5 masthead hover:bg-primary transition-colors">
-		№ → Записаться на пилот
+
+	<!-- Interactive CTA right -->
+	<a href="#contact" class="justify-self-end group inline-flex items-stretch btn-glow bg-primary text-primary-content hover:bg-base-content transition-colors overflow-hidden">
+		<!-- Live pilots counter -->
+		<span class="hidden sm:flex items-center gap-1.5 px-3 py-2.5 border-r border-primary-content/25 masthead text-accent">
+			<span class="inline-block w-1.5 h-1.5 bg-accent rounded-full pulse-dot"></span>
+			<span>{pilotsFree}&nbsp;мест</span>
+		</span>
+		<!-- Main label -->
+		<span class="flex items-center gap-2.5 px-4 py-2.5">
+			<span class="masthead">Записаться</span>
+			<span class="font-mono tabular text-accent transition-transform duration-300 group-hover:translate-x-1">→</span>
+		</span>
 	</a>
-</div>
+</header>
 
 <!-- Hero — single focus, full-bleed photo, cinema -->
 <section
@@ -567,76 +588,136 @@
 	</p>
 </section>
 
-<!-- Contact / Pilot signup -->
+<!-- Contact / Pilot signup — распределён по ширине, с editor's letter -->
 <section
 	id="contact"
-	class="section-rhythm relative px-6 py-14 border-b border-base-content/20 overflow-hidden"
+	class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden"
 	style="background-image: linear-gradient(rgba(242,234,218,0.94), rgba(242,234,218,0.88)), url('/bg/texture.png'); background-size: cover; background-position: center;"
 >
-	<div class="relative max-w-2xl">
-		<div class="eyebrow mb-4">№ 05 · Связь</div>
-		<h2 class="font-display italic text-4xl md:text-5xl font-medium text-base-content leading-[1.05]">
-			Пилот<br />
-			<span class="text-primary">начинается с письма.</span>
-		</h2>
-		<p class="font-body text-base text-base-content/80 mt-5 max-w-lg leading-relaxed">
-			Первые три пилотных места — бесплатно. Я собираю каталог меню сам, настраиваю QR-коды, передаю ключ от кухни в Telegram.
-		</p>
+	<div class="chapter-folio chapter-folio-accent" style="bottom: -18vh; right: -4vw;">VII</div>
 
-		<!-- Индикатор свободных пилотных мест -->
-		<div class="mt-8 border border-base-content/30 bg-base-200/60 backdrop-blur-sm">
-			<div class="px-5 py-3 flex items-center justify-between border-b border-base-content/25 masthead">
-				<span>№ пилотных мест</span>
-				<span class="text-accent">{pilotsFree} из {PILOTS_TOTAL} свободно</span>
+	<div class="relative max-w-7xl mx-auto w-full">
+		<!-- Top bar -->
+		<div class="flex items-center justify-between pb-3 border-b border-base-content masthead">
+			<div class="flex items-baseline gap-3">
+				<span class="eyebrow">Глава VII</span>
+				<span class="font-display italic text-xl md:text-2xl font-medium text-base-content">Связь</span>
 			</div>
-			<div class="grid grid-cols-3 gap-0">
-				{#each pilotRoman as roman, i (roman)}
-					{@const taken = i < PILOTS_TAKEN}
-					<div class="p-5 border-r last:border-r-0 border-base-content/20 text-center {taken ? 'bg-primary text-primary-content' : 'bg-transparent'}">
-						<div class="font-mono tabular text-[10px] tracking-[0.2em] {taken ? 'opacity-80' : 'text-accent'}">
-							ПИЛОТ № {roman}
-						</div>
-						<div class="font-display italic text-3xl font-medium mt-1.5 leading-none">
-							{taken ? "Занят" : "Свободен"}
-						</div>
-						<div class="font-mono tabular text-[10px] tracking-[0.14em] mt-2 {taken ? 'opacity-70' : 'text-base-content/55'}">
-							{taken ? "— настройка идёт" : "0 ₽ · 14 дней"}
-						</div>
+			<span>пилот · запись · письмо</span>
+		</div>
+
+		<!-- Two-column composition -->
+		<div class="mt-12 md:mt-20 grid grid-cols-1 md:grid-cols-[1.15fr_1fr] gap-10 md:gap-16 items-start">
+			<!-- LEFT — заголовок, тариф-описание, пилот-индикатор -->
+			<div>
+				<h2 class="font-display italic font-medium text-base-content leading-[1.0]" style="font-size: clamp(48px, 7vw, 96px); letter-spacing: -0.03em;">
+					Пилот<br />
+					<span class="text-primary">начинается</span><br />
+					с&nbsp;письма.
+				</h2>
+				<p class="font-body text-base md:text-lg text-base-content/80 mt-8 max-w-lg leading-relaxed">
+					Первые три пилотных места — бесплатно. Я собираю каталог меню сам, настраиваю QR-коды, передаю ключ от кухни в Telegram.
+				</p>
+
+				<!-- Индикатор свободных пилотных мест -->
+				<div class="mt-10 border border-base-content bg-base-100">
+					<div class="px-5 py-3 flex items-center justify-between border-b border-base-content/25 masthead">
+						<span>№ пилотных мест</span>
+						<span class="text-accent flex items-center gap-1.5">
+							<span class="inline-block w-1.5 h-1.5 bg-accent rounded-full pulse-dot"></span>
+							{pilotsFree} из {PILOTS_TOTAL} свободно
+						</span>
 					</div>
-				{/each}
+					<div class="grid grid-cols-3 gap-0">
+						{#each pilotRoman as roman, i (roman)}
+							{@const taken = i < PILOTS_TAKEN}
+							<div class="p-5 border-r last:border-r-0 border-base-content/20 text-center {taken ? 'bg-primary text-primary-content' : 'bg-transparent'}">
+								<div class="font-mono tabular text-[10px] tracking-[0.2em] {taken ? 'opacity-80' : 'text-accent'}">
+									ПИЛОТ № {roman}
+								</div>
+								<div class="font-display italic text-3xl font-medium mt-1.5 leading-none">
+									{taken ? "Занят" : "Свободен"}
+								</div>
+								<div class="font-mono tabular text-[10px] tracking-[0.14em] mt-2 {taken ? 'opacity-70' : 'text-base-content/55'}">
+									{taken ? "— настройка идёт" : "0 ₽ · 14 дней"}
+								</div>
+							</div>
+						{/each}
+					</div>
+					{#if pilotsFree > 0}
+						<div class="px-5 py-3 border-t border-base-content/25 font-display italic text-sm text-base-content/70 leading-snug">
+							Когда все три займутся — тариф «Кафе» от 9 900 ₽/мес, без пилотной скидки.
+						</div>
+					{:else}
+						<div class="px-5 py-3 border-t border-base-content/25 font-display italic text-sm text-error leading-snug">
+							Все пилотные места заняты. Пишите — поставлю в очередь на платный запуск по тарифу «Кафе».
+						</div>
+					{/if}
+				</div>
 			</div>
-			{#if pilotsFree > 0}
-				<div class="px-5 py-3 border-t border-base-content/25 font-display italic text-sm text-base-content/70 leading-snug">
-					Когда все три займутся — тариф «Кафе» от 9 900 ₽/мес, без пилотной скидки.
+
+			<!-- RIGHT — editor's letter (личное письмо от автора) -->
+			<aside class="relative bg-base-100 border border-base-content p-8 md:p-10">
+				<div class="flex items-center justify-between masthead pb-3 mb-6 border-b border-base-content/25">
+					<span>Письмо от автора</span>
+					<span class="text-accent">Kaliningrad · {today.getFullYear()}</span>
 				</div>
-			{:else}
-				<div class="px-5 py-3 border-t border-base-content/25 font-display italic text-sm text-error leading-snug">
-					Все пилотные места заняты. Пишите — поставлю в очередь на платный запуск по тарифу «Кафе».
+
+				<p class="font-display italic text-lg md:text-xl text-base-content leading-[1.55] drop-cap">
+					Я&nbsp;делаю этот продукт один. Сам пишу код, сам собираю каталог, сам отвечаю на вопросы. Поэтому первые три ресторана — бесплатно.
+				</p>
+				<p class="font-display italic text-base md:text-lg text-base-content/80 leading-[1.55] mt-5">
+					Не пресейл, не воронка, не агентство. Работа руками с конкретным шефом и&nbsp;конкретным меню. Я отвечаю на письма в&nbsp;течение суток.
+				</p>
+				<p class="font-display italic text-base md:text-lg text-base-content/80 leading-[1.55] mt-5">
+					Если ваше заведение в&nbsp;Калининграде — могу приехать и&nbsp;показать всё вживую.
+				</p>
+
+				<!-- Signature -->
+				<div class="mt-10 pt-5 border-t border-dotted border-base-content/30 flex items-center justify-between">
+					<div>
+						<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content leading-none">
+							— К.
+						</div>
+						<div class="masthead mt-2">разработчик · автор · TableMind</div>
+					</div>
+					<div class="w-14 h-14 border border-base-content rounded-full flex items-center justify-center">
+						<span class="font-display italic text-xl text-base-content leading-none">T</span>
+					</div>
 				</div>
-			{/if}
+			</aside>
 		</div>
 
-		<div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-0 border-y border-base-content/30">
-			<a href="https://t.me/tablemind" target="_blank" rel="noopener" class="flex items-baseline gap-3 py-5 px-2 border-b sm:border-b-0 sm:border-r border-base-content/25 hover:bg-base-200 transition-colors">
-				<span class="eyebrow tabular w-7">01</span>
-				<div class="flex-1">
-					<div class="font-body font-semibold text-base text-base-content">Telegram</div>
-					<div class="font-display italic text-sm text-base-content/65">@tablemind</div>
+		<!-- Contacts — full-width band -->
+		<div class="mt-14 md:mt-20 grid grid-cols-1 sm:grid-cols-2 gap-0 border-y border-base-content">
+			<a href="https://t.me/tablemind" target="_blank" rel="noopener" class="group flex items-center gap-5 py-6 md:py-8 px-5 md:px-8 border-b sm:border-b-0 sm:border-r border-base-content/25 hover:bg-base-100 transition-colors">
+				<span class="eyebrow tabular shrink-0">01</span>
+				<div class="flex-1 min-w-0">
+					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-none">
+						Telegram
+					</div>
+					<div class="font-body text-sm text-base-content/65 mt-2">
+						@tablemind · обычно отвечаю за&nbsp;пару часов
+					</div>
 				</div>
-				<span class="font-mono tabular text-xs text-base-content">→</span>
+				<span class="font-mono tabular text-xl text-accent shrink-0 group-hover:translate-x-2 transition-transform duration-300">→</span>
 			</a>
-			<a href="mailto:hi@tablemind.ru" class="flex items-baseline gap-3 py-5 px-2 hover:bg-base-200 transition-colors">
-				<span class="eyebrow tabular w-7">02</span>
-				<div class="flex-1">
-					<div class="font-body font-semibold text-base text-base-content">Почта</div>
-					<div class="font-display italic text-sm text-base-content/65">hi@tablemind.ru</div>
+			<a href="mailto:hi@tablemind.ru" class="group flex items-center gap-5 py-6 md:py-8 px-5 md:px-8 hover:bg-base-100 transition-colors">
+				<span class="eyebrow tabular shrink-0">02</span>
+				<div class="flex-1 min-w-0">
+					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-none">
+						Почта
+					</div>
+					<div class="font-body text-sm text-base-content/65 mt-2">
+						hi@tablemind.ru · до&nbsp;суток на&nbsp;ответ
+					</div>
 				</div>
-				<span class="font-mono tabular text-xs text-base-content">→</span>
+				<span class="font-mono tabular text-xl text-accent shrink-0 group-hover:translate-x-2 transition-transform duration-300">→</span>
 			</a>
 		</div>
 
-		<p class="font-display italic text-sm text-base-content/60 mt-6 leading-relaxed">
-			Напишите название ресторана и 2–3 фото меню. Я вернусь с персональным демо за 2 дня.
+		<p class="font-display italic text-base md:text-lg text-base-content/65 mt-8 leading-relaxed max-w-3xl">
+			Напишите название ресторана и&nbsp;2–3 фото меню. Я&nbsp;вернусь с&nbsp;персональным демо за&nbsp;2&nbsp;дня.
 		</p>
 	</div>
 </section>
