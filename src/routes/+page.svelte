@@ -133,13 +133,6 @@
 	</div>
 </section>
 
-<!-- Decorative gouache band -->
-<div
-	class="h-20 md:h-28 border-b border-base-content/20"
-	style="background-image: url('/bg/texture.png'); background-size: cover; background-position: center;"
-	aria-hidden="true"
-></div>
-
 <!-- Method -->
 <section id="method" class="px-6 py-14 border-b border-base-content/20">
 	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead">
@@ -246,8 +239,12 @@
 </section>
 
 <!-- Contact / Pilot signup -->
-<section id="contact" class="px-6 py-14 border-b border-base-content/20">
-	<div class="max-w-2xl">
+<section
+	id="contact"
+	class="relative px-6 py-14 border-b border-base-content/20 overflow-hidden"
+	style="background-image: linear-gradient(rgba(242,234,218,0.94), rgba(242,234,218,0.88)), url('/bg/texture.png'); background-size: cover; background-position: center;"
+>
+	<div class="relative max-w-2xl">
 		<div class="eyebrow mb-4">№ 05 · Связь</div>
 		<h2 class="font-display italic text-4xl md:text-5xl font-medium text-base-content leading-[1.05]">
 			Пилот<br />
