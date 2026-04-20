@@ -11,14 +11,6 @@
 	const pilotsFree = PILOTS_TOTAL - PILOTS_TAKEN;
 	const pilotRoman = ["I", "II", "III"];
 
-	// Склонение слова «место» для счётчика
-	function placesWord(n) {
-		if (n === 0) return "занято";
-		if (n === 1) return "место";
-		if (n >= 2 && n <= 4) return "места";
-		return "мест";
-	}
-
 	// Архитектура — как устроен продукт внутри
 	const arch = [
 		{ roman: "I", label: "Гость", desc: "QR на столе", icon: "QR" },
