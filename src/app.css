@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+	themes: false;
+}
+
+/* TableMind · Menu Card · Light (основная тема сайта) */
+@plugin "daisyui/theme" {
+	name: "tablemind-light";
+	default: true;
+	color-scheme: light;
+
+	--color-base-100: #F2EADA;       /* paper — oat */
+	--color-base-200: #FAF6EB;       /* ivory — surface */
+	--color-base-300: #E6DCC2;       /* bone — soft line */
+	--color-base-content: #1C1D17;   /* ink */
+
+	--color-primary: #3B4A34;        /* moss */
+	--color-primary-content: #F2EADA;
+
+	--color-secondary: #5D6E52;      /* moss soft */
+	--color-secondary-content: #F2EADA;
+
+	--color-accent: #B8812A;         /* ochre */
+	--color-accent-content: #1C1D17;
+
+	--color-neutral: #6B665A;        /* stone */
+	--color-neutral-content: #F2EADA;
+
+	--color-info: #6B4B2E;
+	--color-success: #3B4A34;
+	--color-warning: #B8812A;
+	--color-error: #A8442A;
+
+	--radius-selector: 0;
+	--radius-field: 0;
+	--radius-box: 0;
+
+	--border: 1.5px;
+	--depth: 0;
+	--noise: 0;
+}
+
+@layer base {
+	html {
+		font-family: "Inter Tight", system-ui, sans-serif;
+		font-size: 16px;
+		line-height: 1.5;
+	}
+}
+
+@layer utilities {
+	.font-display {
+		font-family: "Fraunces", "Times New Roman", serif;
+		font-optical-sizing: auto;
+	}
+	.font-body {
+		font-family: "Inter Tight", system-ui, sans-serif;
+	}
+	.font-mono {
+		font-family: "JetBrains Mono", "Menlo", monospace;
+	}
+
+	.masthead {
+		font-family: "JetBrains Mono", "Menlo", monospace;
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--color-neutral);
+	}
+
+	.eyebrow {
+		font-family: "JetBrains Mono", "Menlo", monospace;
+		font-size: 11px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--color-accent);
+		font-weight: 500;
+	}
+
+	.dotted-leader {
+		flex: 1;
+		margin: 0 0.625rem;
+		align-self: end;
+		margin-bottom: 0.375rem;
+		border-bottom: 1px dotted currentColor;
+		opacity: 0.35;
+	}
+
+	.tabular {
+		font-feature-settings: "tnum";
+	}
+}
+
+html, body {
+	background: var(--color-base-100);
+	color: var(--color-base-content);
+}
+
+* {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
