@@ -8,3 +8,9 @@ node_modules
 .vercel
 .DS_Store
 Thumbs.db
+
+
+# screenshots/скриншоты
+*.png
+!static/**/*.png
+
