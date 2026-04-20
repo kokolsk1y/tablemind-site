@@ -11,6 +11,14 @@
 	const pilotsFree = PILOTS_TOTAL - PILOTS_TAKEN;
 	const pilotRoman = ["I", "II", "III"];
 
+	// Склонение слова «место» для счётчика
+	function placesWord(n) {
+		if (n === 0) return "занято";
+		if (n === 1) return "место";
+		if (n >= 2 && n <= 4) return "места";
+		return "мест";
+	}
+
 	// Архитектура — как устроен продукт внутри
 	const arch = [
 		{ roman: "I", label: "Гость", desc: "QR на столе", icon: "QR" },
@@ -52,19 +60,24 @@
 			n: "I",
 			name: "Пилот",
 			price: "0",
-			sub: "первые 3 ресторана · полное сопровождение руками",
-			bullets: ["Моё меню, моя настройка", "До 30 столов", "Telegram-бот в подарок", "Честная себестоимость OpenRouter"]
+			sub: "первые 3 ресторана · настройка руками",
+			bullets: [
+				"Ваше меню — настраиваю сам",
+				"До 30 столов",
+				"Telegram-бот в подарок",
+				"AI-токены OpenRouter оплачиваю я"
+			]
 		},
 		{
 			n: "II",
 			name: "Кафе",
 			price: "9 900",
-			sub: "После пилота — техфи за работу сервиса, не за поддержку руками",
+			sub: "после пилота — техфи за работу сервиса",
 			bullets: [
-				"Хостинг, AI-токены OpenRouter, домен и SSL",
-				"Обновление меню 1 раз в 2 месяца",
-				"Мониторинг аптайма и быстрые фиксы багов",
-				"Email-поддержка, ответ до 24 ч"
+				"Хостинг, AI-токены, домен и SSL",
+				"Обновление меню раз в 2 месяца",
+				"Мониторинг аптайма и фиксы",
+				"Email-поддержка до 24 ч"
 			],
 			featured: true
 		},
@@ -73,7 +86,12 @@
 			name: "Сеть",
 			price: "—",
 			sub: "поговорим",
-			bullets: ["От 3 точек", "API и интеграции", "Белая метка", "SLA и отчётность"]
+			bullets: [
+				"От 3 точек",
+				"API и интеграции",
+				"Белая метка под ваш бренд",
+				"SLA и отчётность"
+			]
 		}
 	];
 </script>
@@ -90,45 +108,29 @@
 		</span>
 	</a>
 
-	<!-- Chapter-numbered nav center -->
-	<nav class="hidden md:flex gap-7 lg:gap-9 justify-self-center">
-		<a href="#method" class="group flex items-baseline gap-1.5 link-underline text-base-content hover:text-accent transition-colors">
-			<span class="font-mono tabular text-[10px] text-accent/70 group-hover:text-accent tracking-[0.15em]">I</span>
-			<span class="font-body font-medium text-sm">Метод</span>
-		</a>
-		<a href="#arch" class="group flex items-baseline gap-1.5 link-underline text-base-content hover:text-accent transition-colors">
-			<span class="font-mono tabular text-[10px] text-accent/70 group-hover:text-accent tracking-[0.15em]">II</span>
-			<span class="font-body font-medium text-sm">Архитектура</span>
-		</a>
-		<a href="#verifier" class="group flex items-baseline gap-1.5 link-underline text-base-content hover:text-accent transition-colors">
-			<span class="font-mono tabular text-[10px] text-accent/70 group-hover:text-accent tracking-[0.15em]">III</span>
-			<span class="font-body font-medium text-sm">Верификатор</span>
-		</a>
-		<a href="#tarif" class="group flex items-baseline gap-1.5 link-underline text-base-content hover:text-accent transition-colors">
-			<span class="font-mono tabular text-[10px] text-accent/70 group-hover:text-accent tracking-[0.15em]">IV</span>
-			<span class="font-body font-medium text-sm">Тариф</span>
-		</a>
+	<!-- Nav center — без римских, чистые ссылки -->
+	<nav class="hidden md:flex gap-8 lg:gap-10 justify-self-center font-body font-medium text-sm">
+		<a href="#method" class="link-underline text-base-content hover:text-accent transition-colors">Метод</a>
+		<a href="#arch" class="link-underline text-base-content hover:text-accent transition-colors">Архитектура</a>
+		<a href="#verifier" class="link-underline text-base-content hover:text-accent transition-colors">Верификатор</a>
+		<a href="#tarif" class="link-underline text-base-content hover:text-accent transition-colors">Тариф</a>
 	</nav>
 
-	<!-- Interactive CTA right -->
-	<a href="#contact" class="justify-self-end group inline-flex items-stretch btn-glow bg-primary text-primary-content hover:bg-base-content transition-colors overflow-hidden">
-		<!-- Live pilots counter -->
-		<span class="hidden sm:flex items-center gap-1.5 px-3 py-2.5 border-r border-primary-content/25 masthead text-accent">
-			<span class="inline-block w-1.5 h-1.5 bg-accent rounded-full pulse-dot"></span>
-			<span>{pilotsFree}&nbsp;мест</span>
+	<!-- Cleaner CTA с живым счётчиком -->
+	<a href="#contact" class="justify-self-end group inline-flex items-center gap-3 bg-primary text-primary-content px-5 py-3 hover:bg-base-content transition-all duration-300 btn-glow">
+		<span class="inline-block w-1.5 h-1.5 bg-accent rounded-full pulse-dot shrink-0"></span>
+		<span class="font-body font-semibold text-sm whitespace-nowrap">Записаться</span>
+		<span class="hidden sm:inline font-mono tabular text-[11px] text-accent tracking-[0.12em] whitespace-nowrap">
+			· {pilotsFree}&nbsp;{placesWord(pilotsFree)}
 		</span>
-		<!-- Main label -->
-		<span class="flex items-center gap-2.5 px-4 py-2.5">
-			<span class="masthead">Записаться</span>
-			<span class="font-mono tabular text-accent transition-transform duration-300 group-hover:translate-x-1">→</span>
-		</span>
+		<span class="font-mono tabular text-accent transition-transform duration-300 group-hover:translate-x-1.5 shrink-0">→</span>
 	</a>
 </header>
 
 <!-- Hero — single focus, full-bleed photo, cinema -->
 <section
 	class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden flex flex-col justify-end"
-	style="background-image: linear-gradient(rgba(242,234,218,0.86), rgba(242,234,218,0.72)), url('/bg/hero.png'); background-size: cover; background-position: center;"
+	style="background-image: linear-gradient(rgba(242,234,218,1) 0%, rgba(242,234,218,0.88) 80px, rgba(242,234,218,0.72) 40%, rgba(242,234,218,0.78) 100%), url('/bg/hero.png'); background-size: cover; background-position: center;"
 	use:parallaxBg={{ factor: 0.35 }}
 >
 	<!-- Oversized folio numeral -->
@@ -547,41 +549,48 @@
 <!-- Tariffs -->
 <section id="tarif" class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden">
 	<div class="chapter-folio chapter-folio-primary" style="top: -10vh; left: -5vw;">$</div>
-	<div class="relative flex items-center justify-between pb-3 border-b border-base-content masthead sticky-label" use:reveal>
-		<span>Три пакета</span>
-		<span>₽ / месяц</span>
-	</div>
-	<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-8">
-		{#each tariffs as p, i (p.n)}
-			<div
-				class="relative p-7 border-b md:border-b-0 md:border-r border-base-content/20 last:border-b-0 md:last:border-r-0 transition-transform duration-500 hover:-translate-y-1 {p.featured ? 'bg-base-200' : ''}"
-				use:reveal={{ delay: 150 + i * 150 }}
-			>
-				{#if p.featured}
-					<div class="absolute top-0 left-0 right-0 h-[3px] bg-accent"></div>
-				{/if}
-				<div class="font-mono tabular text-[10px] text-accent tracking-[0.2em]">№ {p.n}</div>
-				<div class="font-display italic text-3xl font-medium text-base-content mt-2">{p.name}</div>
-				<div class="font-display italic text-[13px] text-base-content/65 mt-1 max-w-[260px] leading-snug">{p.sub}</div>
-				<div class="flex items-baseline gap-1.5 mt-6">
-					<div class="font-mono tabular text-[40px] font-medium text-base-content leading-none">{p.price}</div>
-					{#if p.price !== "—" && p.price !== "0"}
-						<div class="font-body text-[13px] text-base-content/60">₽ / мес</div>
-					{/if}
-				</div>
-				<div class="border-t border-dotted border-base-content/30 my-5"></div>
-				{#each p.bullets as b (b)}
-					<div class="flex gap-2.5 py-1.5 text-sm text-base-content/80">
-						<span class="font-mono text-accent text-[10px] pt-1">·</span>
-						<span>{b}</span>
-					</div>
-				{/each}
+
+	<div class="relative max-w-5xl mx-auto w-full">
+		<div class="flex items-center justify-between pb-3 border-b border-base-content masthead" use:reveal>
+			<div class="flex items-baseline gap-3">
+				<span class="eyebrow">Глава VI</span>
+				<span class="font-display italic text-xl md:text-2xl font-medium text-base-content">Три пакета</span>
 			</div>
-		{/each}
+			<span>₽ / месяц</span>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-10 md:mt-14 border border-base-content/25">
+			{#each tariffs as p, i (p.n)}
+				<div
+					class="relative p-7 md:p-8 border-b md:border-b-0 md:border-r border-base-content/20 last:border-b-0 md:last:border-r-0 transition-all duration-500 hover:bg-base-100 group overflow-hidden {p.featured ? 'bg-base-100' : ''}"
+					use:reveal={{ delay: 150 + i * 150 }}
+				>
+					<!-- Верхняя линия-акцент: у featured всегда, у других появляется при hover -->
+					<div class="absolute top-0 left-0 right-0 h-[3px] bg-accent transition-transform duration-500 {p.featured ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}" style="transform-origin: left center;"></div>
+
+					<div class="font-mono tabular text-[10px] text-accent tracking-[0.2em]">№ {p.n}</div>
+					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content mt-2 transition-transform duration-500 group-hover:translate-x-1">{p.name}</div>
+					<div class="font-display italic text-[13px] text-base-content/65 mt-1.5 leading-snug min-h-[2.6em]">{p.sub}</div>
+
+					<div class="flex items-baseline gap-1.5 mt-6">
+						<div class="font-mono tabular text-[44px] md:text-[52px] font-medium text-base-content leading-none">{p.price}</div>
+						{#if p.price !== "—" && p.price !== "0"}
+							<div class="font-body text-[13px] text-base-content/60">₽ / мес</div>
+						{/if}
+					</div>
+
+					<div class="border-t border-dotted border-base-content/30 my-5 md:my-6"></div>
+
+					{#each p.bullets as b (b)}
+						<div class="flex gap-2.5 py-1.5 text-[13px] md:text-sm text-base-content/80 leading-snug">
+							<span class="font-mono text-accent text-[10px] pt-1 shrink-0">·</span>
+							<span>{b}</span>
+						</div>
+					{/each}
+				</div>
+			{/each}
+		</div>
 	</div>
-	<p class="font-display italic text-sm text-base-content/70 mt-8 pt-5 border-t border-dotted border-base-content/30 max-w-3xl leading-relaxed">
-		Я разработчик-одиночка. 9 900 ₽/мес — честная плата за то, чтобы продукт жил и работал. Это не агентство, не менеджер аккаунта, не круглосуточная поддержка.
-	</p>
 </section>
 
 <!-- Contact / Pilot signup — распределён по ширине, с editor's letter -->
