@@ -100,9 +100,11 @@
 <header class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 md:gap-8 px-5 md:px-8 py-5 bg-base-100 relative z-10">
 	<!-- Logo left -->
 	<a href="/" class="justify-self-start flex items-center gap-3 group">
-		<span class="inline-block w-8 h-8 border-[1.5px] border-base-content flex items-center justify-center transition-all group-hover:bg-base-content group-hover:text-base-100">
-			<span class="font-display italic text-lg leading-none">T</span>
-		</span>
+		<img
+			src="/logo.png"
+			alt="TableMind — AI-официант"
+			class="w-10 h-10 md:w-11 md:h-11 object-contain transition-transform duration-500 group-hover:scale-[1.06]"
+		/>
 		<span class="font-display italic text-xl font-semibold text-base-content tracking-wide hidden sm:inline">
 			TableMind
 		</span>
