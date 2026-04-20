@@ -1,5 +1,5 @@
 <script>
-	import { reveal, parallaxBg, counter, typingSequence } from "$lib/actions.js";
+	import { reveal, parallaxBg, counter, typingSequence, horizontalScroll } from "$lib/actions.js";
 
 	// ────────────────────────────────────────────────────────────
 	// ВАЖНО: состояние пилотных мест. Обновлять руками при продаже.
@@ -109,7 +109,7 @@
 
 <!-- Hero -->
 <section
-	class="relative px-6 py-12 md:py-20 md:grid md:grid-cols-[1.3fr_1fr] md:gap-16 border-b border-base-content/20 overflow-hidden"
+	class="section-rhythm relative px-6 py-12 md:py-20 md:grid md:grid-cols-[1.3fr_1fr] md:gap-16 md:items-center border-b border-base-content/20 overflow-hidden"
 	style="background-image: linear-gradient(rgba(242,234,218,0.92), rgba(242,234,218,0.82)), url('/bg/hero.png'); background-size: cover; background-position: center;"
 	use:parallaxBg={{ factor: 0.35 }}
 >
@@ -212,8 +212,8 @@
 </section>
 
 <!-- Method -->
-<section id="method" class="px-6 py-14 border-b border-base-content/20">
-	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead" use:reveal>
+<section id="method" class="section-rhythm px-6 py-14 border-b border-base-content/20">
+	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead sticky-label py-3" use:reveal>
 		<span>№ 02 — МЕТОД</span>
 		<span>Четыре хода</span>
 	</div>
@@ -231,66 +231,116 @@
 	</div>
 </section>
 
-<!-- Architecture (NEW) -->
-<section id="arch" class="px-6 py-14 border-b border-base-content/20 bg-base-200">
-	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead" use:reveal>
-		<span>№ 03 — АРХИТЕКТУРА</span>
-		<span>Как устроено внутри</span>
-	</div>
-
-	<!-- Flow diagram -->
-	<div class="mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-0 relative">
-		<!-- Animated flowing line между нодами на десктопе -->
-		<div
-			class="arch-flow-line hidden md:block absolute top-7 left-[10%] right-[10%] h-px pointer-events-none"
-			aria-hidden="true"
-		></div>
-
-		{#each arch as step, i (step.roman)}
-			<div
-				class="relative flex md:flex-col items-center md:items-center gap-4 md:gap-0 text-left md:text-center"
-				use:reveal={{ delay: 150 + i * 180 }}
-			>
-				<!-- Node circle -->
-				<div class="relative w-14 h-14 shrink-0 z-10 bg-base-200">
-					<div class="absolute inset-0 border-[1.5px] border-base-content rounded-full bg-base-100 flex items-center justify-center">
-						<span class="font-mono tabular text-[11px] font-semibold text-base-content tracking-wide">
-							{step.icon}
-						</span>
-					</div>
-					<!-- Pulse ring -->
-					<div class="absolute inset-0 border-[1.5px] border-accent rounded-full pulse-dot opacity-40"></div>
-				</div>
-
-				<div class="md:mt-4 flex-1 md:flex-none">
-					<div class="font-mono tabular text-[10px] text-accent tracking-[0.18em]">
-						{step.roman}
-					</div>
-					<div class="font-display italic text-xl font-medium text-base-content leading-tight mt-0.5">
-						{step.label}
-					</div>
-					<div class="font-body text-xs text-base-content/65 mt-1 leading-snug">
-						{step.desc}
-					</div>
-				</div>
-
-				<!-- Connector (mobile vertical) -->
-				{#if i < arch.length - 1}
-					<div class="md:hidden absolute left-[27px] top-14 bottom-[-32px] w-px border-l border-dotted border-base-content/40"></div>
-				{/if}
+<!-- Architecture — pinned horizontal scroll (Apple/Stripe style) -->
+<section id="arch" class="bg-base-200 border-b border-base-content/20">
+	<div class="h-scroll-wrapper" data-horizontal-wrapper>
+		<div class="h-scroll-pin">
+			<!-- Header (sticky внутри pin) -->
+			<div class="px-6 pt-6 pb-3 flex items-center justify-between masthead border-b border-base-content/25">
+				<span>№ 03 — АРХИТЕКТУРА</span>
+				<span class="hidden md:inline">Скроллите вниз — поток идёт вправо</span>
+				<span class="md:hidden">Как устроено внутри</span>
 			</div>
-		{/each}
-	</div>
 
-	<div class="mt-10 md:mt-14 font-display italic text-sm md:text-base text-base-content/75 leading-relaxed max-w-2xl" use:reveal>
-		Поток всегда один: QR открывает PWA за две секунды, AI читает JSON-каталог меню,
-		верификатор отдельной моделью сверяет каждый ответ, вызов официанта уходит в
-		ваш Telegram с номером стола и контекстом. Никаких серверов, которые нужно администрировать.
+			<!-- Intro copy на первом экране пина -->
+			<div class="px-6 py-5 md:py-8 border-b border-base-content/25">
+				<h2 class="font-display italic text-3xl md:text-5xl font-medium text-base-content leading-[1.05] max-w-3xl">
+					Поток<br class="md:hidden" />
+					<span class="text-primary">всегда один.</span>
+				</h2>
+				<p class="font-body text-sm md:text-base text-base-content/75 mt-3 md:mt-4 max-w-xl leading-relaxed">
+					QR → PWA → AI-агент → верификатор → Telegram. Никаких серверов,
+					которые нужно администрировать.
+				</p>
+			</div>
+
+			<!-- Horizontal track -->
+			<div class="h-scroll-track" use:horizontalScroll>
+				{#each arch as step, i (step.roman)}
+					<div class="shrink-0 w-[85vw] md:w-[38vw] lg:w-[28vw] relative">
+						<div class="border border-base-content/30 bg-base-100 p-6 md:p-8 h-full flex flex-col gap-5 md:gap-8">
+							<div class="flex items-center justify-between masthead border-b border-dotted border-base-content/25 pb-3">
+								<span>Шаг № {step.roman}</span>
+								<span class="text-accent">{String(i + 1).padStart(2, "0")} / {String(arch.length).padStart(2, "0")}</span>
+							</div>
+
+							<!-- Node visual -->
+							<div class="flex items-center gap-5">
+								<div class="relative w-16 h-16 md:w-20 md:h-20 shrink-0">
+									<div class="absolute inset-0 border-[1.5px] border-base-content rounded-full bg-base-200 flex items-center justify-center">
+										<span class="font-mono tabular text-[13px] font-semibold text-base-content tracking-wide">
+											{step.icon}
+										</span>
+									</div>
+									<div class="absolute inset-0 border-[1.5px] border-accent rounded-full pulse-dot opacity-50"></div>
+								</div>
+								<div class="flex-1 min-w-0">
+									<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-none">
+										{step.label}
+									</div>
+									<div class="font-body text-[13px] text-base-content/65 mt-2">
+										{step.desc}
+									</div>
+								</div>
+							</div>
+
+							<!-- Descriptive copy per step -->
+							<div class="font-body text-sm text-base-content/80 leading-relaxed">
+								{#if i === 0}
+									Гость подходит к столу и видит QR. Сканирует камерой — открывается веб-приложение. Устанавливать ничего не нужно, аккаунтов нет.
+								{:else if i === 1}
+									PWA — HTML и JavaScript на GitHub Pages. Загружается за меньше двух секунд даже на медленном 4G. Работает в любом браузере телефона.
+								{:else if i === 2}
+									Клод Хайку 4.5 через OpenRouter. Дешёвый, быстрый, говорит на 12 языках. Промпт собирается из меню-JSON и истории разговора.
+								{:else if i === 3}
+									Отдельная модель проверяет каждый ответ официанта. Сверяет состав, аллергены и цены с картой шефа. Если не сходится — помечает ответ.
+								{:else}
+									Telegram-бот получает сообщение: номер стола, выбранные блюда, сумма, время. Официант видит и идёт к гостю.
+								{/if}
+							</div>
+
+							<div class="mt-auto pt-4 border-t border-dotted border-base-content/25 masthead flex items-center justify-between">
+								<span>{step.icon} · технически</span>
+								<span class="text-accent">→</span>
+							</div>
+						</div>
+					</div>
+				{/each}
+
+				<!-- Trailing card -->
+				<div class="shrink-0 w-[85vw] md:w-[38vw] lg:w-[28vw]">
+					<div class="border border-base-content/30 bg-primary text-primary-content p-6 md:p-8 h-full flex flex-col justify-between">
+						<div>
+							<div class="masthead opacity-70 border-b border-primary-content/30 pb-3">
+								Итого
+							</div>
+							<h3 class="font-display italic text-4xl md:text-5xl font-medium leading-[1.05] mt-6">
+								Работает<br />из коробки.
+							</h3>
+							<p class="font-body text-sm opacity-85 mt-4 leading-relaxed">
+								Пять компонентов, один поток, ноль серверов которые вы администрируете. Я настраиваю всё за день — дальше продукт живёт сам.
+							</p>
+						</div>
+						<a href="#contact" class="btn-glow inline-flex items-center gap-2.5 bg-accent text-accent-content font-body font-semibold text-sm py-4 px-5 mt-6 self-start">
+							<span class="font-mono tabular text-[11px] opacity-70">№ →</span>
+							<span>Записаться на пилот</span>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<!-- Scroll progress bar (визуально показывает как далеко уехал поток) -->
+			<div class="px-6 pt-4 pb-6">
+				<div class="h-scroll-progress-track">
+					<div class="h-scroll-progress-fill"></div>
+				</div>
+			</div>
+		</div>
 	</div>
 </section>
 
 <!-- Dialogue -->
-<section id="verifier" class="px-6 py-14 border-b border-base-content/20 md:grid md:grid-cols-[1fr_1.2fr] md:gap-12">
+<section id="verifier" class="section-rhythm px-6 py-14 border-b border-base-content/20 md:grid md:grid-cols-[1fr_1.2fr] md:gap-12 md:items-center">
 	<div>
 		<div class="eyebrow mb-4">№ 03 · Главное</div>
 		<h2 class="font-display text-4xl md:text-5xl font-medium italic text-base-content leading-[1.05]">
@@ -352,8 +402,8 @@
 </section>
 
 <!-- Tariffs -->
-<section id="tarif" class="px-6 py-14 border-b border-base-content/20">
-	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead" use:reveal>
+<section id="tarif" class="section-rhythm px-6 py-14 border-b border-base-content/20">
+	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead sticky-label py-3" use:reveal>
 		<span>№ 04 — ТАРИФ · ЧЕСТНЫЙ СЧЁТ</span>
 		<span>₽ / месяц</span>
 	</div>
@@ -393,7 +443,7 @@
 <!-- Contact / Pilot signup -->
 <section
 	id="contact"
-	class="relative px-6 py-14 border-b border-base-content/20 overflow-hidden"
+	class="section-rhythm relative px-6 py-14 border-b border-base-content/20 overflow-hidden"
 	style="background-image: linear-gradient(rgba(242,234,218,0.94), rgba(242,234,218,0.88)), url('/bg/texture.png'); background-size: cover; background-position: center;"
 >
 	<div class="relative max-w-2xl">

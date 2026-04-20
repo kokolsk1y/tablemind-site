@@ -194,6 +194,96 @@ html, body {
 }
 
 /* На мобильных отключаем тяжёлый scroll-behaviour при reduced motion */
+/* Section rhythm — унифицированная высота и центрированное содержимое */
+@layer utilities {
+	.section-rhythm {
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+	@media (max-width: 767px) {
+		.section-rhythm {
+			min-height: auto;
+			padding-top: 4rem;
+			padding-bottom: 4rem;
+		}
+	}
+
+	/* Sticky заголовок секции — прибивается к верху при скролле внутри */
+	.sticky-label {
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		background: var(--color-base-100);
+		backdrop-filter: blur(6px);
+	}
+	.sticky-label-alt {
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		background: var(--color-base-200);
+		backdrop-filter: blur(6px);
+	}
+
+	/* Pinned horizontal scroll — wrapper и pin контейнер */
+	.h-scroll-wrapper {
+		position: relative;
+		height: 380vh;
+	}
+	@media (max-width: 767px) {
+		.h-scroll-wrapper {
+			height: auto;
+		}
+	}
+	.h-scroll-pin {
+		position: sticky;
+		top: 0;
+		height: 100vh;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+	@media (max-width: 767px) {
+		.h-scroll-pin {
+			position: static;
+			height: auto;
+			overflow: visible;
+		}
+	}
+	.h-scroll-track {
+		display: flex;
+		align-items: center;
+		will-change: transform;
+		padding: 0 6vw;
+		gap: 6vw;
+		flex: 1;
+	}
+	@media (max-width: 767px) {
+		.h-scroll-track {
+			flex-direction: column;
+			padding: 0;
+			gap: 3rem;
+			transform: none !important;
+		}
+	}
+	.h-scroll-progress-track {
+		height: 2px;
+		background: var(--color-base-content);
+		opacity: 0.15;
+		position: relative;
+	}
+	.h-scroll-progress-fill {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		background: var(--color-accent);
+		width: calc(var(--scroll-progress, 0) * 100%);
+		transition: width 60ms linear;
+	}
+}
+
 /* Animated flow line в секции архитектуры — поток данных */
 .arch-flow-line {
 	background-image: linear-gradient(

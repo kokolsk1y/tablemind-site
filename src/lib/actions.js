@@ -161,6 +161,58 @@ function wait(ms) {
 }
 
 /**
+ * Pinned horizontal scroll — Apple/Stripe pattern.
+ * Контейнер-родитель остаётся тянуться (height 300-400vh), внутренняя
+ * sticky-секция прибита к viewport, а её содержимое едет translateX
+ * пропорционально прогрессу скролла по родителю.
+ *
+ * Usage: <div.wrapper><div.pin><div use:horizontalScroll>...</div></div></div>
+ */
+export function horizontalScroll(node, options = {}) {
+	const { easing = (t) => t } = options;
+
+	function getWrapper() {
+		// Ищем ближайшего родителя с data-horizontal-wrapper
+		let el = node;
+		while (el && el.parentElement) {
+			el = el.parentElement;
+			if (el.dataset?.horizontalWrapper !== undefined) return el;
+		}
+		return null;
+	}
+
+	const wrapper = getWrapper();
+	if (!wrapper) return { destroy() {} };
+
+	function onScroll() {
+		const rect = wrapper.getBoundingClientRect();
+		const range = wrapper.offsetHeight - window.innerHeight;
+		if (range <= 0) return;
+		const raw = -rect.top / range;
+		const progress = Math.max(0, Math.min(1, raw));
+		const eased = easing(progress);
+		const maxShift = Math.max(0, node.scrollWidth - window.innerWidth + 48);
+		node.style.transform = `translate3d(${-eased * maxShift}px, 0, 0)`;
+
+		// Пробрасываем progress вниз через CSS-переменную для child-анимаций
+		node.style.setProperty("--scroll-progress", String(eased));
+		wrapper.style.setProperty("--scroll-progress", String(eased));
+	}
+
+	onScroll();
+	const throttled = () => requestAnimationFrame(onScroll);
+	window.addEventListener("scroll", throttled, { passive: true });
+	window.addEventListener("resize", throttled);
+
+	return {
+		destroy() {
+			window.removeEventListener("scroll", throttled);
+			window.removeEventListener("resize", throttled);
+		}
+	};
+}
+
+/**
  * Scroll-progress bar: привязывается к <div> и обновляет width 0-100% по вертикальному скроллу.
  */
 export function scrollProgress(node) {
