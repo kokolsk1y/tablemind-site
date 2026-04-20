@@ -96,8 +96,8 @@
 	];
 </script>
 
-<!-- Nav — truly centered grid с интерактивной CTA -->
-<header class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 md:gap-8 px-5 md:px-8 py-5 border-b border-base-content/20 bg-base-100">
+<!-- Nav — truly centered grid с чистой CTA -->
+<header class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 md:gap-8 px-5 md:px-8 py-5 bg-base-100 relative z-10">
 	<!-- Logo left -->
 	<a href="/" class="justify-self-start flex items-center gap-3 group">
 		<span class="inline-block w-8 h-8 border-[1.5px] border-base-content flex items-center justify-center transition-all group-hover:bg-base-content group-hover:text-base-100">
@@ -116,21 +116,17 @@
 		<a href="#tarif" class="link-underline text-base-content hover:text-accent transition-colors">Тариф</a>
 	</nav>
 
-	<!-- Cleaner CTA с живым счётчиком -->
-	<a href="#contact" class="justify-self-end group inline-flex items-center gap-3 bg-primary text-primary-content px-5 py-3 hover:bg-base-content transition-all duration-300 btn-glow">
-		<span class="inline-block w-1.5 h-1.5 bg-accent rounded-full pulse-dot shrink-0"></span>
-		<span class="font-body font-semibold text-sm whitespace-nowrap">Записаться</span>
-		<span class="hidden sm:inline font-mono tabular text-[11px] text-accent tracking-[0.12em] whitespace-nowrap">
-			· {pilotsFree}&nbsp;{placesWord(pilotsFree)}
-		</span>
+	<!-- Тихая CTA — только обводка, без заливки -->
+	<a href="#contact" class="justify-self-end group inline-flex items-center gap-3 border-[1.5px] border-base-content text-base-content px-5 py-2.5 hover:bg-base-content hover:text-base-100 transition-all duration-300">
+		<span class="font-body font-medium text-sm whitespace-nowrap">Записаться</span>
 		<span class="font-mono tabular text-accent transition-transform duration-300 group-hover:translate-x-1.5 shrink-0">→</span>
 	</a>
 </header>
 
 <!-- Hero — single focus, full-bleed photo, cinema -->
 <section
-	class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden flex flex-col justify-end"
-	style="background-image: linear-gradient(rgba(242,234,218,1) 0%, rgba(242,234,218,0.88) 80px, rgba(242,234,218,0.72) 40%, rgba(242,234,218,0.78) 100%), url('/bg/hero.png'); background-size: cover; background-position: center;"
+	class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden flex flex-col justify-end bg-base-100"
+	style="background-image: linear-gradient(rgba(242,234,218,1) 0%, rgba(242,234,218,1) 140px, rgba(242,234,218,0.82) 45%, rgba(242,234,218,0.75) 100%), url('/bg/hero.png'); background-size: cover; background-position: center;"
 	use:parallaxBg={{ factor: 0.35 }}
 >
 	<!-- Oversized folio numeral -->
@@ -336,18 +332,6 @@
 				<span class="md:hidden">Как устроено внутри</span>
 			</div>
 
-			<!-- Intro copy на первом экране пина -->
-			<div class="px-6 py-5 md:py-8 border-b border-base-content/25">
-				<h2 class="font-display italic text-3xl md:text-5xl font-medium text-base-content leading-[1.05] max-w-3xl">
-					Поток<br class="md:hidden" />
-					<span class="text-primary">всегда один.</span>
-				</h2>
-				<p class="font-body text-sm md:text-base text-base-content/75 mt-3 md:mt-4 max-w-xl leading-relaxed">
-					QR → PWA → AI-агент → верификатор → Telegram. Никаких серверов,
-					которые нужно администрировать.
-				</p>
-			</div>
-
 			<!-- Horizontal track -->
 			<div class="h-scroll-track" use:horizontalScroll>
 				{#each arch as step, i (step.roman)}
@@ -437,27 +421,70 @@
 <section class="section-rhythm relative px-6 py-20 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center">
 	<div class="chapter-folio chapter-folio-primary" style="top: -12vh; right: -8vw;">VI</div>
 
-	<div class="relative masthead mb-8" use:reveal>
-		Главное обещание
-	</div>
+	<div class="relative max-w-7xl mx-auto w-full">
+		<div class="masthead mb-6 md:mb-8" use:reveal>
+			Главное обещание
+		</div>
 
-	<blockquote class="relative font-display italic font-medium text-base-content leading-[0.95] max-w-6xl" style="font-size: clamp(44px, 8.5vw, 120px); letter-spacing: -0.03em;" use:reveal={{ delay: 120 }}>
-		<span class="text-accent">«</span>Всё, что скажет AI,<br />
-		уже&nbsp;<span class="text-primary">в&nbsp;вашем меню.</span><span class="text-accent">»</span>
-	</blockquote>
+		<blockquote class="font-display italic font-medium text-base-content leading-[0.95] max-w-6xl" style="font-size: clamp(44px, 8.5vw, 120px); letter-spacing: -0.03em;" use:reveal={{ delay: 120 }}>
+			<span class="text-accent">«</span>Всё, что скажет AI,<br />
+			уже&nbsp;<span class="text-primary">в&nbsp;вашем меню.</span><span class="text-accent">»</span>
+		</blockquote>
 
-	<div class="relative mt-10 md:mt-14 font-display italic text-base md:text-xl text-base-content/70 max-w-2xl leading-relaxed" use:reveal={{ delay: 280 }}>
-		Ни&nbsp;одного выдуманного блюда. Ни&nbsp;одного несуществующего ингредиента. Ни&nbsp;одного ответа без сверки с&nbsp;картой шефа.
+		<div class="mt-10 md:mt-14 font-display italic text-base md:text-xl text-base-content/70 max-w-2xl leading-relaxed" use:reveal={{ delay: 280 }}>
+			Ни&nbsp;одного выдуманного блюда. Ни&nbsp;одного несуществующего ингредиента. Ни&nbsp;одного ответа без сверки с&nbsp;картой шефа.
+		</div>
+
+		<!-- 3 факт-подпорки: раскрывают обещание конкретикой -->
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-14 md:mt-20 border-y border-base-content/25">
+			<div class="p-6 md:p-8 border-b md:border-b-0 md:border-r border-base-content/25" use:reveal={{ delay: 400 }}>
+				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">01 · источник</div>
+				<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-tight">
+					Из меню шефа
+				</div>
+				<div class="font-body text-sm text-base-content/70 mt-3 leading-snug">
+					AI читает только ваш JSON-каталог. Если блюда нет в карте — его нет и в ответе.
+				</div>
+			</div>
+			<div class="p-6 md:p-8 border-b md:border-b-0 md:border-r border-base-content/25" use:reveal={{ delay: 500 }}>
+				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">02 · сверка</div>
+				<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-tight">
+					97&nbsp;% точность
+				</div>
+				<div class="font-body text-sm text-base-content/70 mt-3 leading-snug">
+					Отдельная модель-верификатор проверяет состав, аллергены и цены перед каждой отправкой гостю.
+				</div>
+			</div>
+			<div class="p-6 md:p-8" use:reveal={{ delay: 600 }}>
+				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">03 · скорость</div>
+				<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-tight">
+					1,4&nbsp;секунды
+				</div>
+				<div class="font-body text-sm text-base-content/70 mt-3 leading-snug">
+					Средний ответ — быстрее, чем гость дочитает описание блюда в меню.
+				</div>
+			</div>
+		</div>
 	</div>
 </section>
 
 <!-- Verifier / Dialogue — натюрморт «блюдо + разговор о нём» -->
-<section id="verifier" class="section-rhythm relative px-6 py-14 border-b border-base-content/20 overflow-hidden">
-	<div class="max-w-7xl mx-auto w-full">
+<section id="verifier" class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden bg-base-200">
+	<div class="chapter-folio" style="bottom: -12vh; left: -4vw;">VI</div>
+	<div class="relative max-w-7xl mx-auto w-full">
+		<!-- Top bar -->
+		<div class="flex items-center justify-between pb-3 border-b border-base-content masthead mb-12 md:mb-16" use:reveal>
+			<div class="flex items-baseline gap-3">
+				<span class="eyebrow">Глава V</span>
+				<span class="font-display italic text-xl md:text-2xl font-medium text-base-content">Главное</span>
+			</div>
+			<span>Голос · верификатор · диалог</span>
+		</div>
+
 		<!-- Левая текстовая часть -->
 		<div class="md:grid md:grid-cols-[1fr_1.4fr] md:gap-16 md:items-start">
 			<div class="md:sticky md:top-20">
-				<div class="eyebrow mb-4" use:reveal>№ 03 · Главное</div>
+				<div class="eyebrow mb-4" use:reveal>№ 03 · суть продукта</div>
 				<h2
 					class="font-display font-medium italic text-base-content leading-[1.02]"
 					style="font-size: clamp(40px, 5.5vw, 72px); letter-spacing: -0.025em;"
@@ -562,11 +589,11 @@
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-10 md:mt-14 border border-base-content/25">
 			{#each tariffs as p, i (p.n)}
 				<div
-					class="relative p-7 md:p-8 border-b md:border-b-0 md:border-r border-base-content/20 last:border-b-0 md:last:border-r-0 transition-all duration-500 hover:bg-base-100 group overflow-hidden {p.featured ? 'bg-base-100' : ''}"
+					class="relative p-7 md:p-8 border-b md:border-b-0 md:border-r border-base-content/20 last:border-b-0 md:last:border-r-0 transition-all duration-500 hover:bg-base-100 group overflow-hidden"
 					use:reveal={{ delay: 150 + i * 150 }}
 				>
-					<!-- Верхняя линия-акцент: у featured всегда, у других появляется при hover -->
-					<div class="absolute top-0 left-0 right-0 h-[3px] bg-accent transition-transform duration-500 {p.featured ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}" style="transform-origin: left center;"></div>
+					<!-- Верхняя линия-акцент появляется плавно при hover — равноправно для всех -->
+					<div class="absolute top-0 left-0 right-0 h-[3px] bg-accent transition-transform duration-500 scale-x-0 group-hover:scale-x-100" style="transform-origin: left center;"></div>
 
 					<div class="font-mono tabular text-[10px] text-accent tracking-[0.2em]">№ {p.n}</div>
 					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content mt-2 transition-transform duration-500 group-hover:translate-x-1">{p.name}</div>
