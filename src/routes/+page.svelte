@@ -155,10 +155,9 @@
 			<div class="flex flex-wrap gap-3" use:reveal={{ delay: 360 }}>
 				<a
 					href="#contact"
-					class="btn-glow bg-primary text-primary-content font-body font-semibold text-sm py-4 px-6 flex items-center gap-2.5 hover:bg-base-content transition-colors"
+					class="btn-glow bg-primary text-primary-content font-body font-semibold text-sm py-4 px-6 hover:bg-base-content transition-colors"
 				>
-					<span class="font-mono tabular text-[11px] opacity-70">№ →</span>
-					<span>Записаться на пилот</span>
+					Записаться на пилот
 				</a>
 				<a
 					href="#method"
@@ -394,9 +393,8 @@
 								Пять компонентов, один поток, ноль серверов которые вы администрируете. Я настраиваю всё за день — дальше продукт живёт сам.
 							</p>
 						</div>
-						<a href="#contact" class="btn-glow inline-flex items-center gap-2.5 bg-accent text-accent-content font-body font-semibold text-sm py-4 px-5 mt-6 self-start">
-							<span class="font-mono tabular text-[11px] opacity-70">№ →</span>
-							<span>Записаться на пилот</span>
+						<a href="#contact" class="btn-glow bg-accent text-accent-content font-body font-semibold text-sm py-4 px-5 mt-6 self-start">
+							Записаться на пилот
 						</a>
 					</div>
 				</div>
@@ -754,28 +752,31 @@
 
 <!-- Footer -->
 <footer class="px-6 py-12 bg-primary text-primary-content">
-	<div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
-		<div>
-			<div class="flex items-center gap-2.5">
-				<span class="inline-block w-7 h-7 border border-primary-content flex items-center justify-center">
-					<span class="font-display italic text-base leading-none">T</span>
-				</span>
-				<span class="font-display italic text-lg font-semibold tracking-wide">TableMind</span>
+	<div class="max-w-7xl mx-auto w-full">
+		<div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+			<div class="flex items-center gap-4">
+				<div class="w-14 h-14 bg-base-100 rounded-full flex items-center justify-center shrink-0">
+					<img
+						src="/logo.png"
+						alt="TableMind"
+						class="w-full h-full object-contain"
+						style="mix-blend-mode: multiply;"
+					/>
+				</div>
+				<span class="font-display italic text-2xl md:text-3xl font-semibold tracking-wide">TableMind</span>
 			</div>
-			<p class="masthead mt-4 max-w-md opacity-80" style="color: inherit">
-				Калининград · {today.getFullYear()}. Делаю руками для первых трёх ресторанов.<br />
-				Без агентств, без пресейла, без маркетинговых баннеров.
-			</p>
+			<div class="flex flex-col sm:flex-row gap-6 md:gap-10 masthead opacity-90" style="color: inherit">
+				<a href="https://t.me/tablemind" target="_blank" rel="noopener" class="link-underline">
+					Telegram · @tablemind
+				</a>
+				<a href="mailto:hi@tablemind.ru" class="link-underline">
+					Почта · hi@tablemind.ru
+				</a>
+			</div>
 		</div>
-		<div class="grid grid-cols-2 gap-x-10 gap-y-2 masthead opacity-90" style="color: inherit">
-			<span>Telegram</span><span>@tablemind</span>
-			<span>Почта</span><span>hi@tablemind.ru</span>
-			<span>Метод</span><a href="#method" class="underline">#method</a>
-			<span>Тариф</span><a href="#tarif" class="underline">#tarif</a>
+		<div class="mt-10 pt-5 border-t border-primary-content/25 flex flex-col sm:flex-row justify-between gap-3 masthead opacity-55" style="color: inherit">
+			<span>© {today.getFullYear()} · TableMind</span>
+			<span>сделано в Калининграде</span>
 		</div>
-	</div>
-	<div class="mt-10 pt-5 border-t border-primary-content/25 flex flex-col sm:flex-row justify-between gap-3 masthead opacity-60" style="color: inherit">
-		<span>© {today.getFullYear()} · TableMind</span>
-		<span>сделано в Калининграде</span>
 	</div>
 </footer>
