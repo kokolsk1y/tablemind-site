@@ -194,6 +194,64 @@ html, body {
 }
 
 /* На мобильных отключаем тяжёлый scroll-behaviour при reduced motion */
+/* Chapter — фоновая гигантская римская цифра */
+@layer utilities {
+	.chapter-folio {
+		position: absolute;
+		font-family: "Fraunces", serif;
+		font-style: italic;
+		font-weight: 400;
+		font-size: clamp(180px, 42vw, 640px);
+		line-height: 0.8;
+		color: var(--color-base-content);
+		opacity: 0.05;
+		pointer-events: none;
+		user-select: none;
+		letter-spacing: -0.04em;
+	}
+	.chapter-folio-primary {
+		color: var(--color-primary);
+		opacity: 0.08;
+	}
+	.chapter-folio-accent {
+		color: var(--color-accent);
+		opacity: 0.12;
+	}
+
+	/* Дроп-кэп — первая буква абзаца крупнее и serif */
+	.drop-cap::first-letter {
+		font-family: "Fraunces", serif;
+		font-style: italic;
+		font-weight: 500;
+		font-size: 3.4em;
+		line-height: 0.85;
+		float: left;
+		margin: 0.15em 0.15em 0 -0.02em;
+		color: var(--color-accent);
+	}
+
+	/* Тёмная секция — moss фон с paper текстом, для контраста */
+	.section-dark {
+		background: var(--color-base-content);
+		color: var(--color-base-100);
+	}
+	.section-dark .text-base-content { color: var(--color-base-100); }
+	.section-dark .masthead { color: rgba(242, 234, 218, 0.55); }
+	.section-dark .eyebrow { color: var(--color-accent); }
+	.section-dark .border-base-content\/20,
+	.section-dark .border-base-content\/25,
+	.section-dark .border-base-content\/30 { border-color: rgba(242, 234, 218, 0.2); }
+	.section-dark .border-base-content { border-color: rgba(242, 234, 218, 0.55); }
+
+	/* Сигнатурная тонкая вертикальная линия — editorial */
+	.v-rule {
+		position: absolute;
+		width: 1px;
+		background: currentColor;
+		opacity: 0.2;
+	}
+}
+
 /* Section rhythm — унифицированная высота и центрированное содержимое */
 @layer utilities {
 	.section-rhythm {

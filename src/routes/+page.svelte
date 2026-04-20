@@ -107,127 +107,184 @@
 	</a>
 </div>
 
-<!-- Hero -->
+<!-- Hero — single focus, full-bleed photo, cinema -->
 <section
-	class="section-rhythm relative px-6 py-12 md:py-20 md:grid md:grid-cols-[1.3fr_1fr] md:gap-16 md:items-center border-b border-base-content/20 overflow-hidden"
-	style="background-image: linear-gradient(rgba(242,234,218,0.92), rgba(242,234,218,0.82)), url('/bg/hero.png'); background-size: cover; background-position: center;"
+	class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden flex flex-col justify-end"
+	style="background-image: linear-gradient(rgba(242,234,218,0.86), rgba(242,234,218,0.72)), url('/bg/hero.png'); background-size: cover; background-position: center;"
 	use:parallaxBg={{ factor: 0.35 }}
 >
-	<div class="relative">
-		<div class="eyebrow mb-5" use:reveal>№ 01 · Закуска</div>
+	<!-- Oversized folio numeral -->
+	<div class="chapter-folio chapter-folio-primary" style="top: 4vh; right: -6vw;">I</div>
+
+	<!-- Small top-left meta -->
+	<div class="relative flex items-center gap-3 masthead mb-auto" use:reveal>
+		<span class="inline-block w-2 h-2 bg-accent rounded-full pulse-dot"></span>
+		<span>Глава I · Закуска</span>
+	</div>
+
+	<!-- Bottom headline -->
+	<div class="relative max-w-5xl">
 		<h1
-			class="font-display font-medium text-base-content leading-[0.95]"
-			style="font-size: clamp(48px, 10vw, 108px); letter-spacing: -0.025em;"
-			use:reveal={{ delay: 100 }}
+			class="font-display font-medium text-base-content leading-[0.92]"
+			style="font-size: clamp(52px, 11vw, 144px); letter-spacing: -0.035em;"
+			use:reveal={{ delay: 80 }}
 		>
 			<span class="italic">AI-официант,</span><br />
-			который<br />
+			<span>который</span><br />
 			<span class="text-primary">знает ваше меню.</span>
 		</h1>
-		<div class="h-px bg-base-content/25 my-8 md:my-10 w-3/4" use:reveal={{ delay: 250 }}></div>
-		<p
-			class="font-body text-base md:text-lg text-base-content/80 max-w-lg leading-relaxed"
-			use:reveal={{ delay: 350 }}
-		>
-			Гость сканирует QR со стола — и получает собеседника, который рассказывает о блюдах голосом и текстом, подбирает комплексы, зовёт живого официанта в Telegram, если нужно.
-		</p>
-		<div class="flex flex-wrap gap-3 mt-8" use:reveal={{ delay: 500 }}>
-			<a
-				href="#contact"
-				class="btn-glow bg-primary text-primary-content font-body font-semibold text-sm py-4 px-6 flex items-center gap-2.5 hover:bg-base-content transition-colors"
+
+		<div class="mt-10 md:mt-12 grid md:grid-cols-[1fr_auto] gap-6 md:gap-10 items-end">
+			<p
+				class="font-body text-base md:text-lg text-base-content/80 max-w-xl leading-relaxed"
+				use:reveal={{ delay: 220 }}
 			>
-				<span class="font-mono tabular text-[11px] opacity-70">№ →</span>
-				<span>Записаться на пилот</span>
-			</a>
-			<a
-				href="#method"
-				class="border-[1.5px] border-base-content text-base-content font-body font-medium text-sm py-4 px-6 hover:bg-base-content/10 transition-colors link-underline"
-			>
-				Смотреть метод
-			</a>
+				Гость сканирует QR со стола — и получает собеседника, который рассказывает о блюдах голосом и текстом, подбирает комплексы, зовёт живого официанта в Telegram, если нужно.
+			</p>
+			<div class="flex flex-wrap gap-3" use:reveal={{ delay: 360 }}>
+				<a
+					href="#contact"
+					class="btn-glow bg-primary text-primary-content font-body font-semibold text-sm py-4 px-6 flex items-center gap-2.5 hover:bg-base-content transition-colors"
+				>
+					<span class="font-mono tabular text-[11px] opacity-70">№ →</span>
+					<span>Записаться на пилот</span>
+				</a>
+				<a
+					href="#method"
+					class="border-[1.5px] border-base-content text-base-content font-body font-medium text-sm py-4 px-6 hover:bg-base-content/10 transition-colors link-underline"
+				>
+					Смотреть метод
+				</a>
+			</div>
 		</div>
 	</div>
 
-	<!-- Numbers that matter -->
-	<div class="relative mt-16 md:mt-0" use:reveal={{ delay: 150 }}>
-		<div class="flex items-center justify-between pb-2 border-b border-base-content/25 masthead">
-			<span>Цифры, которые важны</span>
-			<span>№ — ЗНАЧ</span>
-		</div>
-		<!-- Счётчик: средний ответ AI -->
-		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
-			<div class="font-mono tabular text-[11px] text-accent w-8">01</div>
-			<div class="font-body text-[15px] text-base-content font-medium">Средний ответ AI</div>
-			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
-			<div class="font-mono tabular text-[15px] text-base-content font-medium">
-				&lt;&nbsp;<span use:counter={{ target: 1.4, duration: 1400, decimals: 1 }}>0.0</span>&nbsp;с
-			</div>
-		</div>
-		<!-- Счётчик: точность -->
-		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
-			<div class="font-mono tabular text-[11px] text-accent w-8">02</div>
-			<div class="font-body text-[15px] text-base-content font-medium">Точность верификатора</div>
-			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
-			<div class="font-mono tabular text-[15px] text-base-content font-medium">
-				<span use:counter={{ target: 97, duration: 1400 }}>0</span>&nbsp;%
-			</div>
-		</div>
-		<!-- Счётчик: языков -->
-		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
-			<div class="font-mono tabular text-[11px] text-accent w-8">03</div>
-			<div class="font-body text-[15px] text-base-content font-medium">Языков ввода</div>
-			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
-			<div class="font-mono tabular text-[15px] text-base-content font-medium">
-				<span use:counter={{ target: 12, duration: 1400 }}>0</span>
-			</div>
-		</div>
-		<!-- Счётчик: себестоимость -->
-		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
-			<div class="font-mono tabular text-[11px] text-accent w-8">04</div>
-			<div class="font-body text-[15px] text-base-content font-medium">Себестоимость диалога</div>
-			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
-			<div class="font-mono tabular text-[15px] text-base-content font-medium">
-				~&nbsp;<span use:counter={{ target: 3, duration: 1400 }}>0</span>&nbsp;₽
-			</div>
-		</div>
-		<!-- Статические метрики -->
-		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
-			<div class="font-mono tabular text-[11px] text-accent w-8">05</div>
-			<div class="font-body text-[15px] text-base-content font-medium">Клиентских кейсов</div>
-			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
-			<div class="font-mono tabular text-[15px] text-base-content font-medium">0 · пока</div>
-		</div>
-		<div class="flex items-baseline py-4 border-b border-dotted border-base-content/30">
-			<div class="font-mono tabular text-[11px] text-accent w-8">06</div>
-			<div class="font-body text-[15px] text-base-content font-medium">Свободных пилотов</div>
-			<div class="flex-1 border-b border-dotted border-base-content/30 mx-3 mb-1.5"></div>
-			<div class="font-mono tabular text-[15px] text-accent font-medium">
-				{pilotsFree}&nbsp;из&nbsp;{PILOTS_TOTAL}
-			</div>
-		</div>
-		<p class="font-display italic text-sm text-base-content/70 mt-5 leading-relaxed">
-			Первые три ресторана — лично, руками. Без пресейла, без агентств, без красивых слов.
-		</p>
+	<!-- Scroll cue -->
+	<div class="relative mt-16 flex items-center gap-2 masthead opacity-60" use:reveal={{ delay: 600 }}>
+		<div class="w-10 h-px bg-current"></div>
+		<span>скроллите вниз</span>
 	</div>
 </section>
 
-<!-- Method -->
-<section id="method" class="section-rhythm px-6 py-14 border-b border-base-content/20">
-	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead sticky-label py-3" use:reveal>
-		<span>№ 02 — МЕТОД</span>
-		<span>Четыре хода</span>
+<!-- Numbers — на тёмной болотной подкладке, контраст -->
+<section class="section-dark section-rhythm relative px-6 py-20 md:py-24 overflow-hidden">
+	<div class="chapter-folio chapter-folio-accent" style="top: -4vh; left: -4vw;">II</div>
+
+	<div class="relative flex items-center justify-between pb-3 border-b border-current/30 masthead" use:reveal>
+		<span>Глава II · Цифры, которые важны</span>
+		<span class="hidden sm:inline">Numbers</span>
 	</div>
-	<div class="grid grid-cols-1 md:grid-cols-4 gap-0 mt-8">
+
+	<div class="relative mt-10 md:mt-16 grid grid-cols-2 md:grid-cols-3 gap-0">
+		<!-- Stat 01 -->
+		<div class="relative p-5 md:p-8 border-r border-b border-current/20 md:border-b-0" use:reveal={{ delay: 100 }}>
+			<div class="font-mono tabular text-[11px] text-accent tracking-[0.18em]">01 · отклик</div>
+			<div class="font-display italic text-5xl md:text-7xl font-medium mt-4 leading-none">
+				&lt;<span use:counter={{ target: 1.4, duration: 1600, decimals: 1 }}>0.0</span>
+			</div>
+			<div class="masthead mt-3">секунд средний ответ AI</div>
+		</div>
+		<!-- Stat 02 -->
+		<div class="relative p-5 md:p-8 border-b border-current/20 md:border-b-0 md:border-r" use:reveal={{ delay: 200 }}>
+			<div class="font-mono tabular text-[11px] text-accent tracking-[0.18em]">02 · точность</div>
+			<div class="font-display italic text-5xl md:text-7xl font-medium mt-4 leading-none">
+				<span use:counter={{ target: 97, duration: 1600 }}>0</span>&nbsp;<span class="text-2xl md:text-4xl align-top">%</span>
+			</div>
+			<div class="masthead mt-3">верификатор ловит несоответствия</div>
+		</div>
+		<!-- Stat 03 -->
+		<div class="relative p-5 md:p-8 border-r border-b border-current/20 md:border-b-0" use:reveal={{ delay: 300 }}>
+			<div class="font-mono tabular text-[11px] text-accent tracking-[0.18em]">03 · языки</div>
+			<div class="font-display italic text-5xl md:text-7xl font-medium mt-4 leading-none">
+				<span use:counter={{ target: 12, duration: 1600 }}>0</span>
+			</div>
+			<div class="masthead mt-3">языков понимает голосом и текстом</div>
+		</div>
+		<!-- Stat 04 -->
+		<div class="relative p-5 md:p-8 border-b border-current/20 md:border-b-0 md:border-r" use:reveal={{ delay: 400 }}>
+			<div class="font-mono tabular text-[11px] text-accent tracking-[0.18em]">04 · себестоимость</div>
+			<div class="font-display italic text-5xl md:text-7xl font-medium mt-4 leading-none">
+				~<span use:counter={{ target: 3, duration: 1600 }}>0</span>&nbsp;<span class="text-2xl md:text-4xl align-top">₽</span>
+			</div>
+			<div class="masthead mt-3">стоит один диалог гостя с AI</div>
+		</div>
+		<!-- Stat 05 -->
+		<div class="relative p-5 md:p-8 border-r border-current/20" use:reveal={{ delay: 500 }}>
+			<div class="font-mono tabular text-[11px] text-accent tracking-[0.18em]">05 · пилоты</div>
+			<div class="font-display italic text-5xl md:text-7xl font-medium mt-4 leading-none text-accent">
+				{pilotsFree}<span class="text-2xl md:text-4xl align-top text-current">/{PILOTS_TOTAL}</span>
+			</div>
+			<div class="masthead mt-3">свободных бесплатных мест</div>
+		</div>
+		<!-- Stat 06 -->
+		<div class="relative p-5 md:p-8" use:reveal={{ delay: 600 }}>
+			<div class="font-mono tabular text-[11px] text-accent tracking-[0.18em]">06 · кейсы</div>
+			<div class="font-display italic text-5xl md:text-7xl font-medium mt-4 leading-none">
+				0<span class="text-2xl md:text-4xl align-top font-body not-italic font-normal opacity-60">пока</span>
+			</div>
+			<div class="masthead mt-3">клиентских кейсов — первых ищу сейчас</div>
+		</div>
+	</div>
+
+	<p class="relative font-display italic text-base md:text-lg mt-12 md:mt-16 max-w-2xl opacity-75 leading-relaxed" use:reveal>
+		Первые три ресторана — лично, руками. Без пресейла, без агентств, без красивых слов.
+	</p>
+</section>
+
+<!-- Chapter break III · Метод -->
+<section class="relative px-6 py-24 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center">
+	<div class="chapter-folio" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">III</div>
+	<div class="relative text-center">
+		<div class="masthead text-accent mb-4" use:reveal>Глава III</div>
+		<h2 class="font-display italic font-medium text-base-content leading-[0.9]" style="font-size: clamp(56px, 12vw, 160px); letter-spacing: -0.03em;" use:reveal={{ delay: 120 }}>
+			Метод.
+		</h2>
+		<div class="masthead mt-6" use:reveal={{ delay: 280 }}>четыре хода от стола до кухни</div>
+	</div>
+</section>
+
+<!-- Method — staircase layout -->
+<section id="method" class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden">
+	<div class="chapter-folio" style="bottom: -20vh; right: -6vw;">IV</div>
+
+	<div class="relative flex items-center justify-between pb-3 border-b border-base-content masthead sticky-label" use:reveal>
+		<span>Четыре хода</span>
+		<span>Поток гостя</span>
+	</div>
+
+	<div class="relative grid grid-cols-1 md:grid-cols-2 gap-y-10 md:gap-y-20 gap-x-10 mt-12 md:mt-20">
 		{#each method as [n, title, desc], i (n)}
 			<div
-				class="px-0 md:px-6 py-6 md:py-0 md:border-r border-b md:border-b-0 border-base-content/20 last:border-b-0 md:last:border-r-0 first:pl-0 last:md:pr-0"
-				use:reveal={{ delay: 150 + i * 120 }}
+				class="relative {i % 2 === 1 ? 'md:mt-24' : ''} {i > 0 ? 'md:pl-8' : ''}"
+				use:reveal={{ delay: 100 + i * 140 }}
 			>
-				<div class="font-mono tabular text-[11px] text-accent tracking-[0.16em]">№ {n}</div>
-				<h3 class="font-display italic text-2xl md:text-[26px] font-medium text-base-content mt-2.5 mb-3.5 leading-[1.1]">{title}</h3>
-				<p class="font-body text-sm text-base-content/75 leading-relaxed">{desc}</p>
+				<div class="flex items-start gap-4 md:gap-6">
+					<div class="font-display italic font-medium text-accent leading-none shrink-0" style="font-size: clamp(64px, 10vw, 132px); letter-spacing: -0.04em;">
+						{n}
+					</div>
+					<div class="pt-2 md:pt-4">
+						<h3 class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-[1.05]">
+							{title}
+						</h3>
+						<p class="font-body text-sm md:text-base text-base-content/75 leading-relaxed mt-4 max-w-sm">
+							{desc}
+						</p>
+					</div>
+				</div>
 			</div>
 		{/each}
+	</div>
+</section>
+
+<!-- Chapter break · Архитектура -->
+<section class="section-dark relative px-6 py-24 md:py-32 overflow-hidden flex flex-col justify-center">
+	<div class="chapter-folio chapter-folio-accent" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">V</div>
+	<div class="relative text-center">
+		<div class="masthead mb-4" use:reveal>Глава IV</div>
+		<h2 class="font-display italic font-medium leading-[0.9]" style="font-size: clamp(56px, 12vw, 160px); letter-spacing: -0.03em;" use:reveal={{ delay: 120 }}>
+			Архитектура.
+		</h2>
+		<div class="masthead mt-6" use:reveal={{ delay: 280 }}>как устроено внутри — пять компонентов</div>
 	</div>
 </section>
 
@@ -339,6 +396,25 @@
 	</div>
 </section>
 
+<!-- Pull quote — full-screen cinema moment -->
+<section class="section-rhythm relative px-6 py-20 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center">
+	<div class="chapter-folio chapter-folio-primary" style="top: -12vh; right: -8vw;">VI</div>
+
+	<div class="relative masthead mb-8" use:reveal>
+		Глава V · прямая речь продукта
+	</div>
+
+	<blockquote class="relative font-display italic font-medium text-base-content leading-[0.95] max-w-6xl" style="font-size: clamp(48px, 9vw, 128px); letter-spacing: -0.03em;" use:reveal={{ delay: 120 }}>
+		<span class="text-accent">«</span>В&nbsp;карпаччо&nbsp;—<br class="hidden md:block" />
+		орехи&nbsp;и&nbsp;молочное.<br />
+		Предупрежу&nbsp;<span class="text-primary">кухню.</span><span class="text-accent">»</span>
+	</blockquote>
+
+	<div class="relative mt-10 md:mt-14 font-display italic text-base md:text-xl text-base-content/70 max-w-2xl leading-relaxed" use:reveal={{ delay: 280 }}>
+		— AI·TM, настоящий ответ на вопрос гостя «а аллергены?». Без выдумки. Сверено с картой шефа за 1.2 секунды.
+	</div>
+</section>
+
 <!-- Dialogue -->
 <section id="verifier" class="section-rhythm px-6 py-14 border-b border-base-content/20 md:grid md:grid-cols-[1fr_1.2fr] md:gap-12 md:items-center">
 	<div>
@@ -401,10 +477,23 @@
 	</div>
 </section>
 
+<!-- Chapter break · Тариф -->
+<section class="relative px-6 py-24 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center">
+	<div class="chapter-folio" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">VII</div>
+	<div class="relative text-center">
+		<div class="masthead text-accent mb-4" use:reveal>Глава VI</div>
+		<h2 class="font-display italic font-medium text-base-content leading-[0.9]" style="font-size: clamp(56px, 12vw, 160px); letter-spacing: -0.03em;" use:reveal={{ delay: 120 }}>
+			Честный счёт.
+		</h2>
+		<div class="masthead mt-6" use:reveal={{ delay: 280 }}>пилот ноль — кафе девять девятьсот — сеть по разговору</div>
+	</div>
+</section>
+
 <!-- Tariffs -->
-<section id="tarif" class="section-rhythm px-6 py-14 border-b border-base-content/20">
-	<div class="flex items-center justify-between pb-2.5 border-b border-base-content masthead sticky-label py-3" use:reveal>
-		<span>№ 04 — ТАРИФ · ЧЕСТНЫЙ СЧЁТ</span>
+<section id="tarif" class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden">
+	<div class="chapter-folio chapter-folio-primary" style="top: -10vh; left: -5vw;">$</div>
+	<div class="relative flex items-center justify-between pb-3 border-b border-base-content masthead sticky-label" use:reveal>
+		<span>Три пакета</span>
 		<span>₽ / месяц</span>
 	</div>
 	<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-8">
