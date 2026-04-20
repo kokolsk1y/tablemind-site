@@ -39,9 +39,6 @@
 	}
 
 	const today = new Date();
-	const monthsRoman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
-	const dateStr = `${String(today.getDate()).padStart(2, "0")} · ${monthsRoman[today.getMonth()]} · ${today.getFullYear()}`;
-	const issueNum = String(today.getDate() + today.getMonth() * 31).padStart(3, "0");
 
 	const method = [
 		["I", "QR на столе", "Гость открывает PWA за <2 сек. Никаких установок, никаких аккаунтов."],
@@ -197,7 +194,7 @@
 				<span class="eyebrow">Глава II</span>
 				<span class="font-display italic text-xl md:text-2xl font-medium">Цифры, которые важны</span>
 			</div>
-			<span class="masthead hidden sm:inline">Numbers · Edition 003</span>
+			<span class="masthead hidden sm:inline">Что проверено</span>
 		</div>
 
 		<div class="mt-10 md:mt-16 grid grid-cols-1 md:grid-cols-3 gap-0 border-t border-current/20">
@@ -439,17 +436,16 @@
 	<div class="chapter-folio chapter-folio-primary" style="top: -12vh; right: -8vw;">VI</div>
 
 	<div class="relative masthead mb-8" use:reveal>
-		Глава V · прямая речь продукта
+		Главное обещание
 	</div>
 
-	<blockquote class="relative font-display italic font-medium text-base-content leading-[0.95] max-w-6xl" style="font-size: clamp(48px, 9vw, 128px); letter-spacing: -0.03em;" use:reveal={{ delay: 120 }}>
-		<span class="text-accent">«</span>В&nbsp;карпаччо&nbsp;—<br class="hidden md:block" />
-		орехи&nbsp;и&nbsp;молочное.<br />
-		Предупрежу&nbsp;<span class="text-primary">кухню.</span><span class="text-accent">»</span>
+	<blockquote class="relative font-display italic font-medium text-base-content leading-[0.95] max-w-6xl" style="font-size: clamp(44px, 8.5vw, 120px); letter-spacing: -0.03em;" use:reveal={{ delay: 120 }}>
+		<span class="text-accent">«</span>Всё, что скажет AI,<br />
+		уже&nbsp;<span class="text-primary">в&nbsp;вашем меню.</span><span class="text-accent">»</span>
 	</blockquote>
 
 	<div class="relative mt-10 md:mt-14 font-display italic text-base md:text-xl text-base-content/70 max-w-2xl leading-relaxed" use:reveal={{ delay: 280 }}>
-		— AI·TM, настоящий ответ на вопрос гостя «а аллергены?». Без выдумки. Сверено с картой шефа за 1.2 секунды.
+		Ни&nbsp;одного выдуманного блюда. Ни&nbsp;одного несуществующего ингредиента. Ни&nbsp;одного ответа без сверки с&nbsp;картой шефа.
 	</div>
 </section>
 
@@ -745,8 +741,7 @@
 		</div>
 	</div>
 	<div class="mt-10 pt-5 border-t border-primary-content/25 flex flex-col sm:flex-row justify-between gap-3 masthead opacity-60" style="color: inherit">
-		<span>© {today.getFullYear()} · TABLEMIND</span>
-		<span>№ {issueNum} — ВЫПУСК {monthsRoman[today.getMonth()]}</span>
-		<span>СДЕЛАНО В КАЛИНИНГРАДЕ</span>
+		<span>© {today.getFullYear()} · TableMind</span>
+		<span>сделано в Калининграде</span>
 	</div>
 </footer>
