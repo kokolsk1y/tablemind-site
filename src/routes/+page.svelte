@@ -732,14 +732,14 @@
 		<div class="mt-12 md:mt-16">
 			<div class="masthead mb-3">или напрямую</div>
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-0 border-y border-base-content">
-			<a href="https://t.me/tablemind" target="_blank" rel="noopener" class="group flex items-center gap-5 py-6 md:py-8 px-5 md:px-8 border-b sm:border-b-0 sm:border-r border-base-content/25 hover:bg-base-100 transition-colors">
+			<a href="https://t.me/tablemind_orders_bot" target="_blank" rel="noopener" class="group flex items-center gap-5 py-6 md:py-8 px-5 md:px-8 border-b sm:border-b-0 sm:border-r border-base-content/25 hover:bg-base-100 transition-colors">
 				<span class="eyebrow tabular shrink-0">01</span>
 				<div class="flex-1 min-w-0">
 					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-none">
 						Telegram
 					</div>
 					<div class="font-body text-sm text-base-content/65 mt-2">
-						@tablemind · обычно отвечаю за&nbsp;пару часов
+						@tablemind_orders_bot · бот соберёт заявку и передаст мне
 					</div>
 				</div>
 				<span class="font-mono tabular text-xl text-accent shrink-0 group-hover:translate-x-2 transition-transform duration-300">→</span>
@@ -780,8 +780,8 @@
 				<span class="font-display italic text-2xl md:text-3xl font-semibold tracking-wide">TableMind</span>
 			</div>
 			<div class="flex flex-col sm:flex-row gap-6 md:gap-10 masthead opacity-90" style="color: inherit">
-				<a href="https://t.me/tablemind" target="_blank" rel="noopener" class="link-underline">
-					Telegram · @tablemind
+				<a href="https://t.me/tablemind_orders_bot" target="_blank" rel="noopener" class="link-underline">
+					Telegram · @tablemind_orders_bot
 				</a>
 				<a href="mailto:hi@tablemind.ru" class="link-underline">
 					Почта · hi@tablemind.ru
