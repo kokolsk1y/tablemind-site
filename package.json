@@ -21,6 +21,7 @@
 		"vite": "^6.2.0"
 	},
 	"dependencies": {
+		"@vercel/analytics": "^2.0.1",
 		"daisyui": "^5.0.0"
 	}
 }

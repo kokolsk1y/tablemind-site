@@ -1,8 +1,14 @@
 <script>
 	import "../app.css";
+	import { onMount } from "svelte";
 	import { scrollProgress } from "$lib/actions.js";
+	import { inject } from "@vercel/analytics";
 
 	let { children } = $props();
+
+	onMount(() => {
+		inject();
+	});
 </script>
 
 <svelte:head>

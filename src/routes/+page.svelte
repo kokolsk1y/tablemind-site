@@ -1,5 +1,6 @@
 <script>
 	import { reveal, parallaxBg, counter, typingSequence, horizontalScroll } from "$lib/actions.js";
+	import LeadForm from "$lib/LeadForm.svelte";
 
 	// ────────────────────────────────────────────────────────────
 	// ВАЖНО: состояние пилотных мест. Обновлять руками при продаже.
@@ -633,9 +634,9 @@
 			<span>пилот · запись · письмо</span>
 		</div>
 
-		<!-- Two-column composition -->
-		<div class="mt-12 md:mt-20 grid grid-cols-1 md:grid-cols-[1.15fr_1fr] gap-10 md:gap-16 items-start">
-			<!-- LEFT — заголовок, тариф-описание, пилот-индикатор -->
+		<!-- Two-column composition: LEFT = заголовок + пилот-индикатор, RIGHT = форма заявки -->
+		<div class="mt-12 md:mt-20 grid grid-cols-1 md:grid-cols-[1fr_1.05fr] gap-10 md:gap-12 items-start">
+			<!-- LEFT — заголовок, описание, пилот-индикатор -->
 			<div>
 				<h2 class="font-display italic font-medium text-base-content leading-[1.0]" style="font-size: clamp(48px, 7vw, 96px); letter-spacing: -0.03em;">
 					Пилот<br />
@@ -683,46 +684,54 @@
 				</div>
 			</div>
 
-			<!-- RIGHT — editor's letter (личное письмо от автора) -->
-			<aside class="relative bg-base-100 border border-base-content p-8 md:p-10">
-				<div class="flex items-center justify-between masthead pb-3 mb-6 border-b border-base-content/25">
-					<span>Письмо от автора</span>
-					<span class="text-accent">Kaliningrad · {today.getFullYear()}</span>
-				</div>
-
-				<p class="font-display italic text-lg md:text-xl text-base-content leading-[1.55] drop-cap">
-					Я&nbsp;делаю этот продукт один. Сам пишу код, сам собираю каталог, сам отвечаю на вопросы. Поэтому первые три ресторана — бесплатно.
-				</p>
-				<p class="font-display italic text-base md:text-lg text-base-content/80 leading-[1.55] mt-5">
-					Не пресейл, не воронка, не агентство. Работа руками с конкретным шефом и&nbsp;конкретным меню. Я отвечаю на письма в&nbsp;течение суток.
-				</p>
-				<p class="font-display italic text-base md:text-lg text-base-content/80 leading-[1.55] mt-5">
-					Если ваше заведение в&nbsp;Калининграде — могу приехать и&nbsp;показать всё вживую.
-				</p>
-
-				<!-- Signature -->
-				<div class="mt-10 pt-5 border-t border-dotted border-base-content/30 flex items-center justify-between">
-					<div>
-						<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content leading-none">
-							— К.
-						</div>
-						<div class="masthead mt-2">разработчик · автор · TableMind</div>
-					</div>
-					<img
-						src="/logo.png"
-						alt="TableMind"
-						width="96"
-						height="96"
-						class="w-20 h-20 md:w-24 md:h-24 object-contain"
-						style="mix-blend-mode: multiply;"
-						loading="lazy"
-					/>
-				</div>
-			</aside>
+			<!-- RIGHT — форма заявки на пилот -->
+			<div>
+				<LeadForm />
+			</div>
 		</div>
 
-		<!-- Contacts — full-width band -->
-		<div class="mt-14 md:mt-20 grid grid-cols-1 sm:grid-cols-2 gap-0 border-y border-base-content">
+		<!-- Editor's letter — full-width band под формой -->
+		<aside class="relative bg-base-100 border border-base-content p-8 md:p-10 mt-14 md:mt-20">
+			<div class="flex items-center justify-between masthead pb-3 mb-6 border-b border-base-content/25">
+				<span>Письмо от автора</span>
+				<span class="text-accent">Калининград · {today.getFullYear()}</span>
+			</div>
+
+			<div class="md:grid md:grid-cols-[1fr_auto] md:gap-10 md:items-end">
+				<div>
+					<p class="font-display italic text-lg md:text-xl text-base-content leading-[1.55] drop-cap">
+						Я&nbsp;делаю этот продукт один. Сам пишу код, сам собираю каталог, сам отвечаю на вопросы. Поэтому первые три ресторана — бесплатно.
+					</p>
+					<p class="font-display italic text-base md:text-lg text-base-content/80 leading-[1.55] mt-5">
+						Не пресейл, не воронка, не агентство. Работа руками с конкретным шефом и&nbsp;конкретным меню. Я отвечаю на письма в&nbsp;течение суток. Если ваше заведение в&nbsp;Калининграде — могу приехать и&nbsp;показать всё вживую.
+					</p>
+
+					<!-- Signature -->
+					<div class="mt-10 pt-5 border-t border-dotted border-base-content/30 flex items-end justify-between">
+						<div>
+							<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content leading-none">
+								— К.
+							</div>
+							<div class="masthead mt-2">разработчик · автор · TableMind</div>
+						</div>
+					</div>
+				</div>
+				<img
+					src="/logo.png"
+					alt="TableMind"
+					width="120"
+					height="120"
+					class="hidden md:block w-28 h-28 object-contain self-start"
+					style="mix-blend-mode: multiply;"
+					loading="lazy"
+				/>
+			</div>
+		</aside>
+
+		<!-- Contacts — full-width band: альтернативные каналы -->
+		<div class="mt-12 md:mt-16">
+			<div class="masthead mb-3">или напрямую</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-0 border-y border-base-content">
 			<a href="https://t.me/tablemind" target="_blank" rel="noopener" class="group flex items-center gap-5 py-6 md:py-8 px-5 md:px-8 border-b sm:border-b-0 sm:border-r border-base-content/25 hover:bg-base-100 transition-colors">
 				<span class="eyebrow tabular shrink-0">01</span>
 				<div class="flex-1 min-w-0">
@@ -747,11 +756,8 @@
 				</div>
 				<span class="font-mono tabular text-xl text-accent shrink-0 group-hover:translate-x-2 transition-transform duration-300">→</span>
 			</a>
+			</div>
 		</div>
-
-		<p class="font-display italic text-base md:text-lg text-base-content/65 mt-8 leading-relaxed max-w-3xl">
-			Напишите название ресторана и&nbsp;2–3 фото меню. Я&nbsp;вернусь с&nbsp;персональным демо за&nbsp;2&nbsp;дня.
-		</p>
 	</div>
 </section>
 
