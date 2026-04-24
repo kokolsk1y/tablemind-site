@@ -72,6 +72,12 @@
 				"Мониторинг аптайма и фиксы",
 				"Email-поддержка до 24 ч"
 			],
+			breakdown: [
+				["Инфраструктура и AI-токены", "5 000"],
+				["Мультиязычие · 12+ языков", "2 000"],
+				["Голосовой режим (Тим говорит)", "1 500"],
+				["Поддержка и обновления", "1 400"]
+			],
 			featured: true
 		},
 		{
@@ -610,6 +616,24 @@
 							<span>{b}</span>
 						</div>
 					{/each}
+
+					{#if p.breakdown}
+						<div class="mt-6 pt-5 border-t border-dotted border-base-content/30">
+							<div class="font-mono tabular text-[10px] text-base-content/50 tracking-[0.18em] mb-3">
+								ИЗ ЧЕГО СКЛАДЫВАЕТСЯ
+							</div>
+							{#each p.breakdown as [label, amount] (label)}
+								<div class="flex items-baseline justify-between gap-3 py-1 text-[13px] text-base-content/75 leading-snug">
+									<span>{label}</span>
+									<span class="font-mono tabular text-base-content/90 whitespace-nowrap">{amount} ₽</span>
+								</div>
+							{/each}
+							<div class="flex items-baseline justify-between gap-3 pt-2 mt-2 border-t border-base-content/20 text-[13px] font-medium">
+								<span class="text-base-content">Итого</span>
+								<span class="font-mono tabular text-base-content whitespace-nowrap">9 900 ₽</span>
+							</div>
+						</div>
+					{/if}
 				</div>
 			{/each}
 		</div>
