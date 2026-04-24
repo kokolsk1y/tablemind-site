@@ -333,7 +333,7 @@
 			<div class="h-scroll-track" use:horizontalScroll>
 				{#each arch as step, i (step.roman)}
 					<div class="shrink-0 w-[85vw] md:w-[38vw] lg:w-[28vw] relative">
-						<div class="border border-base-content/30 bg-base-100 p-6 md:p-8 h-full flex flex-col gap-5 md:gap-8">
+						<div class="border border-base-content/30 bg-base-100 p-6 md:p-8 h-full flex flex-col gap-5 md:gap-8 overflow-hidden">
 							<div class="flex items-center justify-between masthead border-b border-dotted border-base-content/25 pb-3">
 								<span>Шаг № {step.roman}</span>
 								<span class="text-accent">{String(i + 1).padStart(2, "0")} / {String(arch.length).padStart(2, "0")}</span>
@@ -350,7 +350,7 @@
 									<div class="absolute inset-0 border-[1.5px] border-accent rounded-full pulse-dot opacity-50"></div>
 								</div>
 								<div class="flex-1 min-w-0">
-									<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-none">
+									<div class="font-display italic text-2xl md:text-3xl lg:text-4xl font-medium text-base-content leading-[1.05] break-words hyphens-auto">
 										{step.label}
 									</div>
 									<div class="font-body text-[13px] text-base-content/65 mt-2">
