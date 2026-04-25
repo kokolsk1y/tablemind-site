@@ -372,44 +372,44 @@
 	];
 </script>
 
-<!-- Nav — truly centered grid с чистой CTA -->
-<header class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 md:gap-8 px-5 md:px-8 py-5 bg-base-100 relative z-10">
-	<!-- Logo left -->
-	<a href="/" class="justify-self-start flex items-center gap-3 group">
-		<img
-			src="/logo.png"
-			alt="TableMind — AI-официант"
-			width="64"
-			height="64"
-			class="w-14 h-14 md:w-16 md:h-16 object-contain transition-transform duration-500 group-hover:scale-[1.06]"
-			style="mix-blend-mode: multiply;"
-		/>
-		<span class="font-display italic text-xl md:text-2xl font-semibold text-base-content tracking-wide hidden sm:inline">
-			TableMind
-		</span>
-	</a>
-
-	<!-- Nav center — без римских, чистые ссылки -->
-	<nav class="hidden md:flex gap-8 lg:gap-10 justify-self-center font-body font-medium text-sm">
-		<a href="#method" class="link-underline text-base-content hover:text-accent transition-colors">Метод</a>
-		<a href="#arch" class="link-underline text-base-content hover:text-accent transition-colors">Архитектура</a>
-		<a href="#verifier" class="link-underline text-base-content hover:text-accent transition-colors">Верификатор</a>
-		<a href="#tarif" class="link-underline text-base-content hover:text-accent transition-colors">Тариф</a>
-	</nav>
-
-	<!-- Тихая CTA — только обводка, без заливки -->
-	<a href="#contact" class="justify-self-end group inline-flex items-center gap-3 border-[1.5px] border-base-content text-base-content px-5 py-2.5 hover:bg-base-content hover:text-base-100 transition-all duration-300">
-		<span class="font-body font-medium text-sm whitespace-nowrap">Записаться</span>
-		<span class="font-mono tabular text-accent transition-transform duration-300 group-hover:translate-x-1.5 shrink-0">→</span>
-	</a>
-</header>
-
-<!-- Hero — single focus, full-bleed photo, cinema -->
+<!-- Hero — single focus, full-bleed photo, cinema. Nav лежит ПОВЕРХ hero,
+	фотография тянется от самого верха страницы — нет переходной линии. -->
 <section
-	class="hero-section section-rhythm relative px-6 py-20 md:py-24 overflow-hidden flex flex-col justify-end bg-base-100 min-h-screen-safe"
-	style="background-image: linear-gradient(rgba(242,234,218,0.96) 0%, rgba(242,234,218,0.86) 50%, rgba(242,234,218,0.78) 100%), url('/bg/hero.webp'); background-size: cover; background-position: center;"
+	class="hero-section section-rhythm relative px-6 pt-28 md:pt-32 pb-20 md:pb-24 overflow-hidden flex flex-col justify-end bg-base-100 min-h-screen-safe"
+	style="background-image: linear-gradient(rgba(242,234,218,0.92) 0%, rgba(242,234,218,0.82) 50%, rgba(242,234,218,0.74) 100%), url('/bg/hero.webp'); background-size: cover; background-position: center;"
 	use:parallaxBg={{ factor: 0.35 }}
 >
+	<!-- Nav — absolutely positioned поверх hero -->
+	<header class="absolute top-0 left-0 right-0 z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-4 md:gap-8 px-5 md:px-8 py-5">
+		<!-- Logo left -->
+		<a href="/" class="justify-self-start flex items-center gap-3 group">
+			<img
+				src="/logo.png"
+				alt="TableMind — AI-официант"
+				width="64"
+				height="64"
+				class="w-14 h-14 md:w-16 md:h-16 object-contain transition-transform duration-500 group-hover:scale-[1.06]"
+				style="mix-blend-mode: multiply;"
+			/>
+			<span class="font-display italic text-xl md:text-2xl font-semibold text-base-content tracking-wide hidden sm:inline">
+				TableMind
+			</span>
+		</a>
+
+		<!-- Nav center — display italic, крупнее, в одном стиле с заголовками глав -->
+		<nav class="hidden md:flex gap-9 lg:gap-12 justify-self-center font-display italic text-lg lg:text-xl">
+			<a href="#method" class="link-underline text-base-content hover:text-accent transition-colors">Метод</a>
+			<a href="#arch" class="link-underline text-base-content hover:text-accent transition-colors">Архитектура</a>
+			<a href="#verifier" class="link-underline text-base-content hover:text-accent transition-colors">Верификатор</a>
+			<a href="#tarif" class="link-underline text-base-content hover:text-accent transition-colors">Тариф</a>
+		</nav>
+
+		<!-- Тихая CTA — только обводка -->
+		<a href="#contact" class="justify-self-end group inline-flex items-center gap-3 border-[1.5px] border-base-content text-base-content px-5 py-2.5 hover:bg-base-content hover:text-base-100 transition-all duration-300">
+			<span class="font-body font-medium text-base whitespace-nowrap">Записаться</span>
+			<span class="font-mono tabular text-accent transition-transform duration-300 group-hover:translate-x-1.5 shrink-0">→</span>
+		</a>
+	</header>
 	<!-- Oversized folio numeral -->
 	<div class="chapter-folio chapter-folio-primary" style="top: 4vh; right: -6vw;">I</div>
 
