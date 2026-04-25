@@ -22,7 +22,7 @@
 		});
 	});
 
-	// ============ NUMBERS PIN — 6 цифр поэтапно ============
+	// ============ NUMBERS PIN — 6 цифр последовательно с паузами для чтения ============
 	function setupNumbersPin() {
 		const nums = document.querySelector(".numbers-pin");
 		if (!nums) return;
@@ -35,28 +35,34 @@
 		gsap.set(stats, { opacity: 0, y: 50 });
 		if (footer) gsap.set(footer, { opacity: 0, y: 30 });
 
+		// Pin-distance 250vh: больше скролла → больше времени на каждый этап.
 		const tl = gsap.timeline({
 			scrollTrigger: {
 				trigger: nums,
 				start: "top top",
-				end: "+=130%",
+				end: "+=250%",
 				pin: true,
 				scrub: 1
 			}
 		});
 
-		tl.to(header, { opacity: 1, y: 0, duration: 0.15, ease: "power2.out" }, 0);
-		tl.to(stats, {
-			opacity: 1,
-			y: 0,
-			stagger: 0.08,
-			duration: 0.2,
-			ease: "power2.out"
-		}, 0.15);
-		if (footer) tl.to(footer, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0.85);
+		// Header появляется → пауза для прочтения главы → потом stats.
+		tl.to(header, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
+		tl.to({}, { duration: 0.4 }); // HOLD — читаем «Цифры, которые важны»
+
+		// Каждый stat: появление (0.3) + hold для чтения (0.5)
+		stats.forEach((stat) => {
+			tl.to(stat, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
+			tl.to({}, { duration: 0.5 }); // HOLD — читаем стат и его описание
+		});
+
+		if (footer) {
+			tl.to(footer, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
+			tl.to({}, { duration: 0.6 }); // финальный HOLD — даём дочитать
+		}
 	}
 
-	// ============ METHOD PIN — 4 шага последовательно (заголовок → описание → следующий) ============
+	// ============ METHOD PIN — 4 шага с паузами на чтение каждого ============
 	function setupMethodPin() {
 		const method = document.querySelector(".method-pin");
 		if (!method) return;
@@ -73,37 +79,31 @@
 			gsap.set(desc, { opacity: 0, y: 20 });
 		});
 
+		// Pin-distance 380vh — длинная секция, 4 шага × (заголовок + описание) с холдами.
 		const tl = gsap.timeline({
 			scrollTrigger: {
 				trigger: method,
 				start: "top top",
-				end: "+=200%", // 4 шага по 2 элемента (заголовок+описание) → длиннее pin
+				end: "+=380%",
 				pin: true,
 				scrub: 1
 			}
 		});
 
-		tl.to(masthead, { opacity: 1, y: 0, duration: 0.05, ease: "power2.out" }, 0);
+		tl.to(masthead, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
+		tl.to({}, { duration: 0.3 }); // HOLD — masthead прочитан
 
-		// Каждый шаг: 2 фазы (заголовок → описание), занимает ~0.22 timeline-времени
+		// Каждый шаг: римская+заголовок появляются (0.3) → hold (0.4) → описание (0.3) → hold (0.7)
 		steps.forEach((step, i) => {
-			const start = 0.08 + i * 0.22;
 			const num = step.querySelector(".method-num");
 			const title = step.querySelector(".method-title");
 			const desc = step.querySelector(".method-desc");
 
-			tl.to([num, title], {
-				opacity: 1,
-				x: 0,
-				duration: 0.08,
-				ease: "power2.out"
-			}, start);
-			tl.to(desc, {
-				opacity: 1,
-				y: 0,
-				duration: 0.08,
-				ease: "power2.out"
-			}, start + 0.1);
+			tl.to([num, title], { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" });
+			tl.to({}, { duration: 0.4 }); // HOLD — читаем заголовок шага
+			tl.to(desc, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
+			// На последнем шаге — финальный hold чуть больше
+			tl.to({}, { duration: i === steps.length - 1 ? 0.9 : 0.7 }); // HOLD — читаем описание
 		});
 	}
 
@@ -127,7 +127,7 @@
 			scrollTrigger: {
 				trigger: pull,
 				start: "top top",
-				end: "+=120%",
+				end: "+=180%",
 				pin: true,
 				scrub: 1
 			}
@@ -153,7 +153,7 @@
 		tl.to(facts, { opacity: 1, y: 0, stagger: 0.08, duration: 0.3, ease: "power2.out" }, 0.7);
 	}
 
-	// ============ TARIF PIN — преимущества → ЦЕНА в финале (мягкая сила) ============
+	// ============ TARIF PIN — преимущества с паузами → ЦЕНА в финале ============
 	function setupTarifPin() {
 		const tarif = document.querySelector(".tarif-pin");
 		if (!tarif) return;
@@ -170,26 +170,36 @@
 		gsap.set(breakdowns, { opacity: 0, y: 16 });
 		gsap.set(prices, { opacity: 0, scale: 0.92 });
 
+		// Pin-distance 320vh — много времени на чтение каждого этапа.
 		const tl = gsap.timeline({
 			scrollTrigger: {
 				trigger: tarif,
 				start: "top top",
-				end: "+=180%",
+				end: "+=320%",
 				pin: true,
 				scrub: 1
 			}
 		});
 
-		// 0–0.1: header
-		tl.to(header, { opacity: 1, y: 0, duration: 0.1, ease: "power2.out" }, 0);
-		// 0.1–0.3: 3 карточки появляются (без цен)
-		tl.to(cards, { opacity: 1, y: 0, stagger: 0.08, duration: 0.2, ease: "power2.out" }, 0.1);
-		// 0.3–0.6: буллеты-преимущества проявляются последовательно
-		tl.to(bullets, { opacity: 1, y: 0, stagger: 0.025, duration: 0.15, ease: "power2.out" }, 0.3);
-		// 0.6–0.75: breakdown (только у одной карточки)
-		tl.to(breakdowns, { opacity: 1, y: 0, stagger: 0.05, duration: 0.15, ease: "power2.out" }, 0.6);
-		// 0.8–1.0: ЦЕНЫ в финале — мягкая сила
-		tl.to(prices, { opacity: 1, scale: 1, stagger: 0.1, duration: 0.2, ease: "back.out(1.4)" }, 0.8);
+		// Header → пауза для прочтения главы.
+		tl.to(header, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
+		tl.to({}, { duration: 0.3 });
+
+		// 3 карточки выходят с лёгким stagger → пауза, чтобы рассмотреть структуру.
+		tl.to(cards, { opacity: 1, y: 0, stagger: 0.15, duration: 0.4, ease: "power2.out" });
+		tl.to({}, { duration: 0.5 });
+
+		// Преимущества проявляются группами по карточкам → большая пауза для чтения списка.
+		tl.to(bullets, { opacity: 1, y: 0, stagger: 0.04, duration: 0.3, ease: "power2.out" });
+		tl.to({}, { duration: 1.0 }); // долгий HOLD — это самое важное место для чтения
+
+		// Breakdown — детализация цены → пауза.
+		tl.to(breakdowns, { opacity: 1, y: 0, stagger: 0.1, duration: 0.3, ease: "power2.out" });
+		tl.to({}, { duration: 0.7 });
+
+		// ЦЕНЫ — финал, мягкая сила.
+		tl.to(prices, { opacity: 1, scale: 1, stagger: 0.15, duration: 0.4, ease: "back.out(1.4)" });
+		tl.to({}, { duration: 0.5 }); // финальный HOLD — даём осознать что всё посчитано
 	}
 
 	/**
@@ -803,7 +813,7 @@
 		</div>
 
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-10 md:mt-14 border border-base-content/25">
-			{#each tariffs as p, i (p.n)}
+			{#each tariffs as p (p.n)}
 				<div class="tarif-card relative p-7 md:p-8 border-b md:border-b-0 md:border-r border-base-content/20 last:border-b-0 md:last:border-r-0 transition-all duration-500 hover:bg-base-100 group overflow-hidden">
 					<!-- Верхняя линия-акцент появляется плавно при hover — равноправно для всех -->
 					<div class="absolute top-0 left-0 right-0 h-[3px] bg-accent transition-transform duration-500 scale-x-0 group-hover:scale-x-100" style="transform-origin: left center;"></div>
