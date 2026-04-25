@@ -6,10 +6,23 @@
 	import LeadForm from "$lib/LeadForm.svelte";
 
 	onMount(() => {
-		// Pin/scrub только на десктопе. На мобильных — pin часто дёргается (iOS inertial scroll).
+		// Safari/iOS защита: игнорируем resize при показе/скрытии URL bar (иначе pin прыгает).
+		ScrollTrigger.config({ ignoreMobileResize: true });
+
+		// Принудительный refresh после полной загрузки страницы — Safari иногда не считает
+		// scrollHeight правильно при первом рендере, и pin начинается не там где надо.
+		if (document.readyState === "complete") {
+			ScrollTrigger.refresh();
+		} else {
+			window.addEventListener("load", () => ScrollTrigger.refresh(), { once: true });
+		}
+
+		// Pin/scrub ТОЛЬКО на устройствах с реальным курсором (мышь/трэкпад) и шириной >=768.
+		// (hover: hover) and (pointer: fine) исключает все touch-only устройства, включая iPad —
+		// там pin-scroll дёргается и сайт «не грузится» как должен.
 		const mm = gsap.matchMedia();
 
-		mm.add("(min-width: 768px)", () => {
+		mm.add("(min-width: 768px) and (hover: hover) and (pointer: fine)", () => {
 			setupNumbersPin();
 			setupMethodPin();
 			setupPullQuotePin();
@@ -413,7 +426,7 @@
 </section>
 
 <!-- Numbers — на тёмной болотной подкладке, контраст. PIN на десктопе. -->
-<section class="numbers-pin section-dark section-rhythm relative px-6 py-20 md:py-24 overflow-hidden min-h-screen">
+<section class="numbers-pin section-dark section-rhythm relative px-6 py-20 md:py-24 overflow-hidden min-h-screen-safe">
 	<div class="chapter-folio chapter-folio-accent" style="top: -4vh; left: -4vw;">II</div>
 
 	<div class="relative max-w-7xl mx-auto w-full">
@@ -507,7 +520,7 @@
 </section>
 
 <!-- Method — staircase layout. PIN на десктопе: 4 шага последовательно (заголовок → описание → следующий). -->
-<section id="method" class="method-pin section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden min-h-screen">
+<section id="method" class="method-pin section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden min-h-screen-safe">
 	<div class="chapter-folio" style="bottom: -20vh; right: -6vw;">IV</div>
 
 	<div class="method-masthead relative flex items-center justify-between pb-3 border-b border-base-content masthead sticky-label">
@@ -644,7 +657,7 @@
 </section>
 
 <!-- Pull quote — full-screen cinema moment. PIN на десктопе. -->
-<section class="pull-quote-pin section-rhythm relative px-6 py-20 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center min-h-screen">
+<section class="pull-quote-pin section-rhythm relative px-6 py-20 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center min-h-screen-safe">
 	<div class="chapter-folio chapter-folio-primary" style="top: -12vh; right: -8vw;">VI</div>
 
 	<div class="relative max-w-7xl mx-auto w-full">
@@ -800,7 +813,7 @@
 </section>
 
 <!-- Tariffs -->
-<section id="tarif" class="tarif-pin section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden min-h-screen">
+<section id="tarif" class="tarif-pin section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden min-h-screen-safe">
 	<div class="chapter-folio chapter-folio-primary" style="top: -10vh; left: -5vw;">$</div>
 
 	<div class="relative max-w-5xl mx-auto w-full">

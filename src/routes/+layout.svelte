@@ -20,6 +20,6 @@
 	<div class="h-full bg-accent" style="width: 0%" use:scrollProgress></div>
 </div>
 
-<div class="min-h-screen bg-base-100 text-base-content font-body">
+<div class="min-h-screen-safe bg-base-100 text-base-content font-body">
 	{@render children()}
 </div>

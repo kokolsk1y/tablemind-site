@@ -110,6 +110,17 @@ html, body {
 	transform: translateY(0);
 }
 
+/* iOS-safe min-height: 100vh ломается на iOS Safari при показе/скрытии URL bar.
+   100svh (small viewport) — стабильное значение, не прыгает. */
+.min-h-screen-safe {
+	min-height: 100vh;
+}
+@supports (min-height: 100svh) {
+	.min-h-screen-safe {
+		min-height: 100svh;
+	}
+}
+
 /* Hero CTA-кнопки — появляются С ЗАДЕРЖКОЙ после загрузки.
    Чтобы пользователь сначала прочитал заголовок и описание, и только
    потом увидел призыв к действию. Это снимает «давление» при заходе. */
@@ -134,18 +145,19 @@ html, body {
 }
 
 /* Word Highlight — слова «печатаются жирным» по мере скролла.
-   Стартовое состояние читаемое (45%) — пользователь видит весь текст,
-   но плотность букв ниже. По мере скролла слова наливаются весом и цветом. */
+   Используем opacity вместо color-mix — Safari < 16.2 не поддерживает color-mix.
+   Это работает во всех браузерах. */
 .wh-word {
-	color: color-mix(in srgb, var(--color-base-content) 45%, transparent);
+	opacity: 0.45;
 	font-weight: 400;
 	font-variation-settings: "wght" 400;
-	transition: color 0.45s cubic-bezier(0.2, 0.6, 0.2, 1),
+	transition: opacity 0.45s cubic-bezier(0.2, 0.6, 0.2, 1),
+		color 0.45s cubic-bezier(0.2, 0.6, 0.2, 1),
 		font-weight 0.45s cubic-bezier(0.2, 0.6, 0.2, 1),
 		font-variation-settings 0.45s cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 .wh-word.wh-active {
-	color: var(--color-base-content);
+	opacity: 1;
 	font-weight: 600;
 	font-variation-settings: "wght" 600;
 }
@@ -317,6 +329,7 @@ html, body {
 		top: 0;
 		z-index: 20;
 		background: var(--color-base-100);
+		-webkit-backdrop-filter: blur(6px);
 		backdrop-filter: blur(6px);
 	}
 	.sticky-label-alt {
@@ -324,6 +337,7 @@ html, body {
 		top: 0;
 		z-index: 20;
 		background: var(--color-base-200);
+		-webkit-backdrop-filter: blur(6px);
 		backdrop-filter: blur(6px);
 	}
 
