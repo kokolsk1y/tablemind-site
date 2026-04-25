@@ -97,12 +97,10 @@ html, body {
 	scroll-behavior: smooth;
 }
 
-/* Scroll-reveal — общая анимация появления блоков */
+/* Scroll-reveal: НЕ прячем элементы через CSS — пусть GSAP сам ставит inline.
+   Так если GSAP не подгрузился (Safari, network error) — текст остаётся видимым.
+   GSAP добавляет .reveal class и inline opacity:0/transform — синхронно с Svelte action. */
 .reveal {
-	opacity: 0;
-	transform: translateY(24px);
-	transition: opacity 0.9s cubic-bezier(0.2, 0.6, 0.2, 1),
-		transform 0.9s cubic-bezier(0.2, 0.6, 0.2, 1);
 	will-change: opacity, transform;
 }
 .revealed {
@@ -123,7 +121,10 @@ html, body {
 
 /* Hero CTA-кнопки — появляются С ЗАДЕРЖКОЙ после загрузки.
    Чтобы пользователь сначала прочитал заголовок и описание, и только
-   потом увидел призыв к действию. Это снимает «давление» при заходе. */
+   потом увидел призыв к действию. Это снимает «давление» при заходе.
+
+   Защита: animation с fallback opacity 1 — если по какой-то причине CSS animation
+   не запустилась (старый Safari?), кнопки всё равно видны через 2 секунды. */
 .hero-cta-block {
 	opacity: 0;
 	transform: translateY(16px);
@@ -135,12 +136,18 @@ html, body {
 		transform: translateY(0);
 	}
 }
-/* На prefers-reduced-motion — мгновенно показываем без сдвига */
+/* prefers-reduced-motion или браузер без CSS animations — показываем сразу */
 @media (prefers-reduced-motion: reduce) {
 	.hero-cta-block {
 		opacity: 1;
 		transform: none;
 		animation: none;
+	}
+}
+@supports not (animation-name: hero-cta-in) {
+	.hero-cta-block {
+		opacity: 1;
+		transform: none;
 	}
 }
 

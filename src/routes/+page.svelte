@@ -6,34 +6,73 @@
 	import LeadForm from "$lib/LeadForm.svelte";
 
 	onMount(() => {
-		// Safari/iOS защита: игнорируем resize при показе/скрытии URL bar (иначе pin прыгает).
-		ScrollTrigger.config({ ignoreMobileResize: true });
-
-		// Принудительный refresh после полной загрузки страницы — Safari иногда не считает
-		// scrollHeight правильно при первом рендере, и pin начинается не там где надо.
-		if (document.readyState === "complete") {
-			ScrollTrigger.refresh();
-		} else {
-			window.addEventListener("load", () => ScrollTrigger.refresh(), { once: true });
+		// Защита: если GSAP/ScrollTrigger по какой-то причине не загрузился — выходим тихо,
+		// контент остаётся видимым (мы убрали CSS opacity: 0 с .reveal по этой же причине).
+		if (typeof gsap?.timeline !== "function" || typeof ScrollTrigger?.create !== "function") {
+			console.warn("GSAP unavailable — anim disabled, content stays visible.");
+			return;
 		}
 
-		// Pin/scrub ТОЛЬКО на устройствах с реальным курсором (мышь/трэкпад) и шириной >=768.
-		// (hover: hover) and (pointer: fine) исключает все touch-only устройства, включая iPad —
-		// там pin-scroll дёргается и сайт «не грузится» как должен.
+		try {
+			ScrollTrigger.config({ ignoreMobileResize: true });
+		} catch (err) {
+			console.warn("ScrollTrigger.config failed:", err);
+		}
+
+		// Принудительный refresh после полной загрузки страницы — Safari иногда не считает
+		// scrollHeight правильно при первом рендере.
+		const refreshSafely = () => {
+			try { ScrollTrigger.refresh(); } catch (err) { console.warn(err); }
+		};
+		if (document.readyState === "complete") {
+			refreshSafely();
+		} else {
+			window.addEventListener("load", refreshSafely, { once: true });
+		}
+
 		const mm = gsap.matchMedia();
 
 		mm.add("(min-width: 768px) and (hover: hover) and (pointer: fine)", () => {
-			setupNumbersPin();
-			setupMethodPin();
-			setupPullQuotePin();
-			setupTarifPin();
+			try {
+				setupNumbersPin();
+				setupMethodPin();
+				setupPullQuotePin();
+				setupTarifPin();
+			} catch (err) {
+				console.error("Pin setup failed, restoring visibility:", err);
+				restoreVisibility();
+				return;
+			}
 
-			// Cleanup при выходе из media query
+			// Safety timer: если за 3с ScrollTrigger не зарегистрировал триггеры —
+			// что-то сломано, восстанавливаем все скрытые pin-элементы.
+			setTimeout(() => {
+				if (ScrollTrigger.getAll().length === 0) {
+					console.warn("No ScrollTriggers registered — restoring visibility");
+					restoreVisibility();
+				}
+			}, 3000);
+
 			return () => {
 				ScrollTrigger.getAll().forEach((t) => t.kill());
 			};
 		});
 	});
+
+	/** Восстанавливает opacity на всех элементах скрытых через gsap.set в pin-функциях */
+	function restoreVisibility() {
+		const selectors = [
+			".numbers-header", ".numbers-stat", ".numbers-footer",
+			".method-masthead", ".method-num", ".method-title", ".method-desc",
+			".pq-masthead", ".pq-quote", ".pq-tagline", ".pq-fact",
+			".tarif-header", ".tarif-card", ".tarif-bullet", ".tarif-breakdown", ".tarif-price"
+		];
+		document.querySelectorAll(selectors.join(",")).forEach((el) => {
+			el.style.opacity = "";
+			el.style.transform = "";
+			el.style.filter = "";
+		});
+	}
 
 	// ============ NUMBERS PIN — 6 цифр последовательно с паузами для чтения ============
 	function setupNumbersPin() {

@@ -29,31 +29,41 @@ export function reveal(node, options = {}) {
 	const { delay = 0, fromY = 32 } = options;
 	node.classList.add("reveal");
 
-	// delay сдвигает только startTrigger — block появляется чуть позже соседей.
-	// Каждые 100ms задержки = +3% сверху на старте (соседи появляются веером).
+	// Защита: если GSAP/ScrollTrigger почему-то недоступны — элемент остаётся видимым.
+	// Это спасает Safari < 16 / случаи когда bundle частично не загрузился.
+	if (typeof gsap?.fromTo !== "function" || typeof ScrollTrigger?.create !== "function") {
+		return { destroy() {} };
+	}
+
 	const startOffset = Math.min(12, Math.max(0, delay / 100) * 3);
 	const startPct = 85 + startOffset;
 
-	const tween = gsap.fromTo(
-		node,
-		{ opacity: 0, y: fromY },
-		{
-			opacity: 1,
-			y: 0,
-			ease: "power2.out",
-			scrollTrigger: {
-				trigger: node,
-				start: `top ${startPct}%`,
-				end: "top 45%",
-				scrub: 0.6
+	let tween;
+	try {
+		tween = gsap.fromTo(
+			node,
+			{ opacity: 0, y: fromY },
+			{
+				opacity: 1,
+				y: 0,
+				ease: "power2.out",
+				scrollTrigger: {
+					trigger: node,
+					start: `top ${startPct}%`,
+					end: "top 45%",
+					scrub: 0.6
+				}
 			}
-		}
-	);
+		);
+	} catch (err) {
+		console.warn("reveal failed, leaving element visible:", err);
+		return { destroy() {} };
+	}
 
 	return {
 		destroy() {
-			tween.scrollTrigger?.kill();
-			tween.kill();
+			tween?.scrollTrigger?.kill();
+			tween?.kill();
 		}
 	};
 }

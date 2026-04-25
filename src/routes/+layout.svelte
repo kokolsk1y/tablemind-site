@@ -7,7 +7,12 @@
 	let { children } = $props();
 
 	onMount(() => {
-		inject();
+		try {
+			inject();
+		} catch (err) {
+			// Vercel analytics не критичен — если упал, не ломаем сайт
+			console.warn("Vercel analytics inject failed:", err);
+		}
 	});
 </script>
 
