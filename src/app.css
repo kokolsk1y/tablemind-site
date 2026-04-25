@@ -110,6 +110,29 @@ html, body {
 	transform: translateY(0);
 }
 
+/* Hero CTA-кнопки — появляются С ЗАДЕРЖКОЙ после загрузки.
+   Чтобы пользователь сначала прочитал заголовок и описание, и только
+   потом увидел призыв к действию. Это снимает «давление» при заходе. */
+.hero-cta-block {
+	opacity: 0;
+	transform: translateY(16px);
+	animation: hero-cta-in 0.9s cubic-bezier(0.2, 0.6, 0.2, 1) 1.6s forwards;
+}
+@keyframes hero-cta-in {
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+/* На prefers-reduced-motion — мгновенно показываем без сдвига */
+@media (prefers-reduced-motion: reduce) {
+	.hero-cta-block {
+		opacity: 1;
+		transform: none;
+		animation: none;
+	}
+}
+
 /* Word Highlight — слова «печатаются жирным» по мере скролла.
    Стартовое состояние читаемое (45%) — пользователь видит весь текст,
    но плотность букв ниже. По мере скролла слова наливаются весом и цветом. */

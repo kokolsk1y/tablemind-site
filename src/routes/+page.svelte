@@ -356,8 +356,8 @@
 
 <!-- Hero — single focus, full-bleed photo, cinema -->
 <section
-	class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden flex flex-col justify-end bg-base-100"
-	style="background-image: linear-gradient(rgba(242,234,218,1) 0%, rgba(242,234,218,1) 140px, rgba(242,234,218,0.82) 45%, rgba(242,234,218,0.75) 100%), url('/bg/hero.webp'); background-size: cover; background-position: center;"
+	class="hero-section section-rhythm relative px-6 py-20 md:py-24 overflow-hidden flex flex-col justify-end bg-base-100"
+	style="background-image: linear-gradient(rgba(242,234,218,0.96) 0%, rgba(242,234,218,0.86) 50%, rgba(242,234,218,0.78) 100%), url('/bg/hero.webp'); background-size: cover; background-position: center;"
 	use:parallaxBg={{ factor: 0.35 }}
 >
 	<!-- Oversized folio numeral -->
@@ -388,7 +388,7 @@
 			>
 				Гость сканирует QR со стола — и получает собеседника, который рассказывает о блюдах голосом и текстом, подбирает комплексы, зовёт живого официанта в Telegram, если нужно.
 			</p>
-			<div class="flex flex-wrap gap-3" use:reveal={{ delay: 360 }}>
+			<div class="hero-cta-block flex flex-wrap gap-3">
 				<a
 					href="#contact"
 					class="btn-glow bg-primary text-primary-content font-body font-semibold text-sm py-4 px-6 hover:bg-base-content transition-colors"
