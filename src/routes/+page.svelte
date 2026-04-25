@@ -379,8 +379,8 @@
 	style="background-image: linear-gradient(rgba(242,234,218,0.92) 0%, rgba(242,234,218,0.82) 50%, rgba(242,234,218,0.74) 100%), url('/bg/hero.webp'); background-size: cover; background-position: center;"
 	use:parallaxBg={{ factor: 0.35 }}
 >
-	<!-- Nav — absolutely positioned поверх hero -->
-	<header class="absolute top-0 left-0 right-0 z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-4 md:gap-8 px-5 md:px-8 py-5">
+	<!-- Nav — absolutely positioned поверх hero, с плашкой-фоном под колонтитулом -->
+	<header class="absolute top-0 left-0 right-0 z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-4 md:gap-8 px-5 md:px-8 py-5 bg-base-100">
 		<!-- Logo left -->
 		<a href="/" class="justify-self-start flex items-center gap-3 group">
 			<img
