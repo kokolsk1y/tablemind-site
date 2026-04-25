@@ -87,9 +87,15 @@ export function parallaxBg(node, options = {}) {
 }
 
 /**
- * Счётчик: анимирует числовое значение от 0 до target при появлении в viewport.
- * Передаётся через callback onTick, т.к. Svelte-state меняется снаружи.
- * formatter — опциональная функция форматирования.
+ * Счётчик: анимирует числовое значение от 0 до target.
+ *
+ * Запуск:
+ * 1) Через IntersectionObserver (default) — стартует когда node появляется в viewport.
+ * 2) Через custom event 'counter:start' — для интеграции с GSAP timeline:
+ *    `el.dispatchEvent(new CustomEvent('counter:start'))`. В этом случае установите
+ *    `manual: true` чтобы IntersectionObserver не дублировал старт.
+ *
+ * Маркируем node атрибутом data-counter-target для удобного querySelectorAll.
  */
 export function counter(node, options = {}) {
 	const {
@@ -97,8 +103,11 @@ export function counter(node, options = {}) {
 		duration = 1500,
 		onTick,
 		formatter = (v) => Math.round(v).toString(),
-		decimals = 0
+		decimals = 0,
+		manual = false
 	} = options;
+
+	node.setAttribute("data-counter-target", String(target));
 
 	let started = false;
 
@@ -108,12 +117,9 @@ export function counter(node, options = {}) {
 		const start = performance.now();
 		function tick(now) {
 			const t = Math.min(1, (now - start) / duration);
-			// ease-out cubic
 			const eased = 1 - Math.pow(1 - t, 3);
 			const val = target * eased;
-			const display = decimals > 0
-				? val.toFixed(decimals)
-				: formatter(val);
+			const display = decimals > 0 ? val.toFixed(decimals) : formatter(val);
 			node.textContent = display;
 			if (t < 1) requestAnimationFrame(tick);
 			else if (onTick) onTick(target);
@@ -121,22 +127,31 @@ export function counter(node, options = {}) {
 		requestAnimationFrame(tick);
 	}
 
-	const obs = new IntersectionObserver(
-		(entries) => {
-			entries.forEach((e) => {
-				if (e.isIntersecting) {
-					animate();
-					obs.unobserve(node);
-				}
-			});
-		},
-		{ threshold: 0.5 }
-	);
-	obs.observe(node);
+	function onManualStart() {
+		animate();
+	}
+	node.addEventListener("counter:start", onManualStart);
+
+	let obs = null;
+	if (!manual) {
+		obs = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((e) => {
+					if (e.isIntersecting) {
+						animate();
+						obs?.unobserve(node);
+					}
+				});
+			},
+			{ threshold: 0.5 }
+		);
+		obs.observe(node);
+	}
 
 	return {
 		destroy() {
-			obs.disconnect();
+			obs?.disconnect();
+			node.removeEventListener("counter:start", onManualStart);
 		}
 	};
 }

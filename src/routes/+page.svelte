@@ -43,36 +43,56 @@
 		const header = nums.querySelector(".numbers-header");
 		const stats = nums.querySelectorAll(".numbers-stat");
 		const footer = nums.querySelector(".numbers-footer");
+		const folio = nums.querySelector(".chapter-folio");
 
 		gsap.set(header, { opacity: 0, y: 30 });
 		gsap.set(stats, { opacity: 0, y: 50 });
 		if (footer) gsap.set(footer, { opacity: 0, y: 30 });
 
-		// Pin-distance 250vh: больше скролла → больше времени на каждый этап.
+		// Pin-distance 220vh — без финального hold-а; pin отпускается сразу после footer.
 		const tl = gsap.timeline({
 			scrollTrigger: {
 				trigger: nums,
 				start: "top top",
-				end: "+=250%",
+				end: "+=220%",
 				pin: true,
-				scrub: 1
+				scrub: 1,
+				anticipatePin: 1, // сглаживает старт pin (Safari)
+				onLeave: () => {
+					// при выходе вверх — сбрасываем накопленный transform у folio
+					if (folio) gsap.set(folio, { clearProps: "transform" });
+				}
 			}
 		});
 
 		// Header появляется → пауза для прочтения главы → потом stats.
 		tl.to(header, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
-		tl.to({}, { duration: 0.4 }); // HOLD — читаем «Цифры, которые важны»
+		tl.to({}, { duration: 0.4 }); // hold — читаем «Цифры, которые важны»
 
-		// Каждый stat: появление (0.3) + hold для чтения (0.5)
+		// Каждый stat: появление (0.3) + hold (0.5). Триггерим counter в момент появления.
 		stats.forEach((stat) => {
-			tl.to(stat, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
-			tl.to({}, { duration: 0.5 }); // HOLD — читаем стат и его описание
+			tl.to(stat, {
+				opacity: 1,
+				y: 0,
+				duration: 0.3,
+				ease: "power2.out",
+				onStart: () => triggerCounters(stat)
+			});
+			tl.to({}, { duration: 0.5 }); // hold — читаем стат и описание
 		});
 
 		if (footer) {
 			tl.to(footer, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
-			tl.to({}, { duration: 0.6 }); // финальный HOLD — даём дочитать
+			// Финальный hold убран — pin отпускается сразу
 		}
+	}
+
+	/** Триггерим counter-анимации внутри stat-блока через custom event */
+	function triggerCounters(stat) {
+		const targets = stat.querySelectorAll("[data-counter-target]");
+		targets.forEach((el) => {
+			el.dispatchEvent(new CustomEvent("counter:start"));
+		});
 	}
 
 	// ============ METHOD PIN — 4 шага с паузами на чтение каждого ============
@@ -82,6 +102,7 @@
 
 		const masthead = method.querySelector(".method-masthead");
 		const steps = method.querySelectorAll(".method-step");
+		const folio = method.querySelector(".chapter-folio");
 
 		gsap.set(masthead, { opacity: 0, y: 20 });
 		steps.forEach((step) => {
@@ -92,31 +113,39 @@
 			gsap.set(desc, { opacity: 0, y: 20 });
 		});
 
-		// Pin-distance 380vh — длинная секция, 4 шага × (заголовок + описание) с холдами.
+		// Pin-distance 320vh (было 380) — финальный hold убран, pin отпускается сразу
+		// после описания последнего шага.
 		const tl = gsap.timeline({
 			scrollTrigger: {
 				trigger: method,
 				start: "top top",
-				end: "+=380%",
+				end: "+=320%",
 				pin: true,
-				scrub: 1
+				scrub: 1,
+				anticipatePin: 1,
+				onLeave: () => {
+					if (folio) gsap.set(folio, { clearProps: "transform" });
+				}
 			}
 		});
 
 		tl.to(masthead, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
-		tl.to({}, { duration: 0.3 }); // HOLD — masthead прочитан
+		tl.to({}, { duration: 0.3 }); // hold — masthead прочитан
 
-		// Каждый шаг: римская+заголовок появляются (0.3) → hold (0.4) → описание (0.3) → hold (0.7)
+		// Каждый шаг: римская+заголовок (0.3) → hold (0.4) → описание (0.3) → hold (0.7).
+		// На последнем шаге БЕЗ финального hold — pin отпускается сразу.
 		steps.forEach((step, i) => {
 			const num = step.querySelector(".method-num");
 			const title = step.querySelector(".method-title");
 			const desc = step.querySelector(".method-desc");
+			const isLast = i === steps.length - 1;
 
 			tl.to([num, title], { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" });
-			tl.to({}, { duration: 0.4 }); // HOLD — читаем заголовок шага
+			tl.to({}, { duration: 0.4 }); // hold — читаем заголовок шага
 			tl.to(desc, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
-			// На последнем шаге — финальный hold чуть больше
-			tl.to({}, { duration: i === steps.length - 1 ? 0.9 : 0.7 }); // HOLD — читаем описание
+			if (!isLast) {
+				tl.to({}, { duration: 0.7 }); // hold — читаем описание перед следующим шагом
+			}
 		});
 	}
 
@@ -142,7 +171,11 @@
 				start: "top top",
 				end: "+=180%",
 				pin: true,
-				scrub: 1
+				scrub: 1,
+				anticipatePin: 1,
+				onLeave: () => {
+					if (folio) gsap.set(folio, { clearProps: "transform" });
+				}
 			}
 		});
 
@@ -166,7 +199,7 @@
 		tl.to(facts, { opacity: 1, y: 0, stagger: 0.08, duration: 0.3, ease: "power2.out" }, 0.7);
 	}
 
-	// ============ TARIF PIN — преимущества с паузами → ЦЕНА в финале ============
+	// ============ TARIF PIN — преимущества → ЦЕНА → breakdown («как разложили») ============
 	function setupTarifPin() {
 		const tarif = document.querySelector(".tarif-pin");
 		if (!tarif) return;
@@ -176,6 +209,7 @@
 		const prices = tarif.querySelectorAll(".tarif-price");
 		const breakdowns = tarif.querySelectorAll(".tarif-breakdown");
 		const bullets = tarif.querySelectorAll(".tarif-bullet");
+		const folio = tarif.querySelector(".chapter-folio");
 
 		gsap.set(header, { opacity: 0, y: 20 });
 		gsap.set(cards, { opacity: 0, y: 40 });
@@ -183,36 +217,39 @@
 		gsap.set(breakdowns, { opacity: 0, y: 16 });
 		gsap.set(prices, { opacity: 0, scale: 0.92 });
 
-		// Pin-distance 320vh — много времени на чтение каждого этапа.
 		const tl = gsap.timeline({
 			scrollTrigger: {
 				trigger: tarif,
 				start: "top top",
-				end: "+=320%",
+				end: "+=300%",
 				pin: true,
-				scrub: 1
+				scrub: 1,
+				anticipatePin: 1,
+				onLeave: () => {
+					if (folio) gsap.set(folio, { clearProps: "transform" });
+				}
 			}
 		});
 
-		// Header → пауза для прочтения главы.
+		// Header → hold для прочтения главы
 		tl.to(header, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
 		tl.to({}, { duration: 0.3 });
 
-		// 3 карточки выходят с лёгким stagger → пауза, чтобы рассмотреть структуру.
+		// 3 карточки → hold чтобы рассмотреть структуру
 		tl.to(cards, { opacity: 1, y: 0, stagger: 0.15, duration: 0.4, ease: "power2.out" });
 		tl.to({}, { duration: 0.5 });
 
-		// Преимущества проявляются группами по карточкам → большая пауза для чтения списка.
+		// Преимущества последовательно → долгий hold для чтения списка
 		tl.to(bullets, { opacity: 1, y: 0, stagger: 0.04, duration: 0.3, ease: "power2.out" });
-		tl.to({}, { duration: 1.0 }); // долгий HOLD — это самое важное место для чтения
+		tl.to({}, { duration: 1.0 });
 
-		// Breakdown — детализация цены → пауза.
-		tl.to(breakdowns, { opacity: 1, y: 0, stagger: 0.1, duration: 0.3, ease: "power2.out" });
-		tl.to({}, { duration: 0.7 });
-
-		// ЦЕНЫ — финал, мягкая сила.
+		// ЦЕНА — кульминация! После того как пользователь прочитал ВСЕ преимущества.
 		tl.to(prices, { opacity: 1, scale: 1, stagger: 0.15, duration: 0.4, ease: "back.out(1.4)" });
-		tl.to({}, { duration: 0.5 }); // финальный HOLD — даём осознать что всё посчитано
+		tl.to({}, { duration: 0.6 }); // hold чтобы осознать цену
+
+		// Breakdown — «а вот как разложили» — после цены показываем что не с потолка
+		tl.to(breakdowns, { opacity: 1, y: 0, stagger: 0.1, duration: 0.3, ease: "power2.out" });
+		// Без финального hold — pin отпускается сразу
 	}
 
 	/**
@@ -369,16 +406,16 @@
 
 <!-- Hero — single focus, full-bleed photo, cinema -->
 <section
-	class="hero-section section-rhythm relative px-6 py-20 md:py-24 overflow-hidden flex flex-col justify-end bg-base-100"
+	class="hero-section section-rhythm relative px-6 py-20 md:py-24 overflow-hidden flex flex-col justify-end bg-base-100 min-h-screen-safe"
 	style="background-image: linear-gradient(rgba(242,234,218,0.96) 0%, rgba(242,234,218,0.86) 50%, rgba(242,234,218,0.78) 100%), url('/bg/hero.webp'); background-size: cover; background-position: center;"
 	use:parallaxBg={{ factor: 0.35 }}
 >
 	<!-- Oversized folio numeral -->
 	<div class="chapter-folio chapter-folio-primary" style="top: 4vh; right: -6vw;">I</div>
 
-	<!-- Small top-left meta -->
+	<!-- Small top-left meta — без пульсации, чтобы не отвлекать от чтения заголовка -->
 	<div class="relative flex items-center gap-3 masthead mb-auto" use:reveal>
-		<span class="inline-block w-2 h-2 bg-accent rounded-full pulse-dot"></span>
+		<span class="inline-block w-2 h-2 bg-accent rounded-full"></span>
 		<span>Глава I · Закуска</span>
 	</div>
 
@@ -443,7 +480,7 @@
 			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-r border-current/20">
 				<div class="eyebrow">01 · отклик</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
-					&lt;<span use:counter={{ target: 1.4, duration: 1600, decimals: 1 }}>0.0</span>
+					&lt;<span use:counter={{ target: 1.4, duration: 1600, decimals: 1, manual: true }}>0.0</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
 					секунд — средний ответ AI на вопрос гостя
@@ -453,7 +490,7 @@
 			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-r border-current/20">
 				<div class="eyebrow">02 · точность</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
-					<span use:counter={{ target: 97, duration: 1600 }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top">%</span>
+					<span use:counter={{ target: 97, duration: 1600, manual: true }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top">%</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
 					верификатор ловит несоответствия между ответом и меню
@@ -463,7 +500,7 @@
 			<div class="numbers-stat relative p-6 md:p-10 border-b border-current/20">
 				<div class="eyebrow">03 · языки</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
-					<span use:counter={{ target: 12, duration: 1600 }}>0</span>
+					<span use:counter={{ target: 12, duration: 1600, manual: true }}>0</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
 					языков понимает голосом и текстом — авто-детект
@@ -473,7 +510,7 @@
 			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-b-0 md:border-r border-current/20">
 				<div class="eyebrow">04 · себестоимость</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
-					~<span use:counter={{ target: 3, duration: 1600 }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top">₽</span>
+					~<span use:counter={{ target: 3, duration: 1600, manual: true }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top">₽</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
 					стоит один полный диалог гостя с AI-официантом
@@ -508,7 +545,7 @@
 </section>
 
 <!-- Chapter break III · Метод -->
-<section class="relative px-6 py-24 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center">
+<section class="relative px-6 py-12 md:py-16 overflow-hidden flex flex-col justify-center">
 	<div class="chapter-folio" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">III</div>
 	<div class="relative text-center">
 		<div class="masthead text-accent mb-4" use:reveal>Глава III</div>
@@ -520,7 +557,7 @@
 </section>
 
 <!-- Method — staircase layout. PIN на десктопе: 4 шага последовательно (заголовок → описание → следующий). -->
-<section id="method" class="method-pin section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden min-h-screen-safe">
+<section id="method" class="method-pin section-rhythm relative px-6 py-20 md:py-24 overflow-hidden min-h-screen-safe">
 	<div class="chapter-folio" style="bottom: -20vh; right: -6vw;">IV</div>
 
 	<div class="method-masthead relative flex items-center justify-between pb-3 border-b border-base-content masthead sticky-label">
@@ -550,7 +587,7 @@
 </section>
 
 <!-- Chapter break · Архитектура -->
-<section class="section-dark relative px-6 py-24 md:py-32 overflow-hidden flex flex-col justify-center">
+<section class="section-dark relative px-6 py-12 md:py-16 overflow-hidden flex flex-col justify-center">
 	<div class="chapter-folio chapter-folio-accent" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">V</div>
 	<div class="relative text-center">
 		<div class="masthead mb-4" use:reveal>Глава IV</div>
@@ -562,7 +599,7 @@
 </section>
 
 <!-- Architecture — pinned horizontal scroll (Apple/Stripe style) -->
-<section id="arch" class="bg-base-200 border-b border-base-content/20">
+<section id="arch" class="bg-base-200">
 	<div class="h-scroll-wrapper" data-horizontal-wrapper>
 		<div class="h-scroll-pin">
 			<!-- Header (sticky внутри pin) -->
@@ -657,7 +694,7 @@
 </section>
 
 <!-- Pull quote — full-screen cinema moment. PIN на десктопе. -->
-<section class="pull-quote-pin section-rhythm relative px-6 py-20 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center min-h-screen-safe">
+<section class="pull-quote-pin section-rhythm relative px-6 py-20 md:py-32 overflow-hidden flex flex-col justify-center min-h-screen-safe">
 	<div class="chapter-folio chapter-folio-primary" style="top: -12vh; right: -8vw;">VI</div>
 
 	<div class="relative max-w-7xl mx-auto w-full">
@@ -708,7 +745,7 @@
 </section>
 
 <!-- Verifier / Dialogue — натюрморт «блюдо + разговор о нём» -->
-<section id="verifier" class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden bg-base-200">
+<section id="verifier" class="section-rhythm relative px-6 py-20 md:py-24 overflow-hidden bg-base-200">
 	<div class="chapter-folio" style="bottom: -12vh; left: -4vw;">VI</div>
 	<div class="relative max-w-7xl mx-auto w-full">
 		<!-- Top bar -->
@@ -801,7 +838,7 @@
 </section>
 
 <!-- Chapter break · Тариф -->
-<section class="relative px-6 py-24 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center">
+<section class="relative px-6 py-12 md:py-16 overflow-hidden flex flex-col justify-center">
 	<div class="chapter-folio" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">VII</div>
 	<div class="relative text-center">
 		<div class="masthead text-accent mb-4" use:reveal>Глава VI</div>
@@ -813,7 +850,7 @@
 </section>
 
 <!-- Tariffs -->
-<section id="tarif" class="tarif-pin section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden min-h-screen-safe">
+<section id="tarif" class="tarif-pin section-rhythm relative px-6 py-20 md:py-24 overflow-hidden min-h-screen-safe">
 	<div class="chapter-folio chapter-folio-primary" style="top: -10vh; left: -5vw;">$</div>
 
 	<div class="relative max-w-5xl mx-auto w-full">
@@ -877,7 +914,7 @@
 <!-- Contact / Pilot signup — распределён по ширине, с editor's letter -->
 <section
 	id="contact"
-	class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden"
+	class="section-rhythm relative px-6 py-20 md:py-24 overflow-hidden"
 	style="background-image: linear-gradient(rgba(242,234,218,0.94), rgba(242,234,218,0.88)), url('/bg/texture.webp'); background-size: cover; background-position: center;"
 >
 	<div class="chapter-folio chapter-folio-accent" style="bottom: -18vh; right: -4vw;">VII</div>
