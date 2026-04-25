@@ -1,6 +1,223 @@
 <script>
+	import { onMount } from "svelte";
+	import { gsap } from "gsap";
+	import { ScrollTrigger } from "gsap/ScrollTrigger";
 	import { reveal, parallaxBg, counter, typingSequence, horizontalScroll } from "$lib/actions.js";
 	import LeadForm from "$lib/LeadForm.svelte";
+
+	onMount(() => {
+		// Pin/scrub только на десктопе. На мобильных — pin часто дёргается (iOS inertial scroll).
+		const mm = gsap.matchMedia();
+
+		mm.add("(min-width: 768px)", () => {
+			setupNumbersPin();
+			setupMethodPin();
+			setupPullQuotePin();
+			setupTarifPin();
+
+			// Cleanup при выходе из media query
+			return () => {
+				ScrollTrigger.getAll().forEach((t) => t.kill());
+			};
+		});
+	});
+
+	// ============ NUMBERS PIN — 6 цифр поэтапно ============
+	function setupNumbersPin() {
+		const nums = document.querySelector(".numbers-pin");
+		if (!nums) return;
+
+		const header = nums.querySelector(".numbers-header");
+		const stats = nums.querySelectorAll(".numbers-stat");
+		const footer = nums.querySelector(".numbers-footer");
+
+		gsap.set(header, { opacity: 0, y: 30 });
+		gsap.set(stats, { opacity: 0, y: 50 });
+		if (footer) gsap.set(footer, { opacity: 0, y: 30 });
+
+		const tl = gsap.timeline({
+			scrollTrigger: {
+				trigger: nums,
+				start: "top top",
+				end: "+=130%",
+				pin: true,
+				scrub: 1
+			}
+		});
+
+		tl.to(header, { opacity: 1, y: 0, duration: 0.15, ease: "power2.out" }, 0);
+		tl.to(stats, {
+			opacity: 1,
+			y: 0,
+			stagger: 0.08,
+			duration: 0.2,
+			ease: "power2.out"
+		}, 0.15);
+		if (footer) tl.to(footer, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0.85);
+	}
+
+	// ============ METHOD PIN — 4 шага последовательно (заголовок → описание → следующий) ============
+	function setupMethodPin() {
+		const method = document.querySelector(".method-pin");
+		if (!method) return;
+
+		const masthead = method.querySelector(".method-masthead");
+		const steps = method.querySelectorAll(".method-step");
+
+		gsap.set(masthead, { opacity: 0, y: 20 });
+		steps.forEach((step) => {
+			const num = step.querySelector(".method-num");
+			const title = step.querySelector(".method-title");
+			const desc = step.querySelector(".method-desc");
+			gsap.set([num, title], { opacity: 0, x: -40 });
+			gsap.set(desc, { opacity: 0, y: 20 });
+		});
+
+		const tl = gsap.timeline({
+			scrollTrigger: {
+				trigger: method,
+				start: "top top",
+				end: "+=200%", // 4 шага по 2 элемента (заголовок+описание) → длиннее pin
+				pin: true,
+				scrub: 1
+			}
+		});
+
+		tl.to(masthead, { opacity: 1, y: 0, duration: 0.05, ease: "power2.out" }, 0);
+
+		// Каждый шаг: 2 фазы (заголовок → описание), занимает ~0.22 timeline-времени
+		steps.forEach((step, i) => {
+			const start = 0.08 + i * 0.22;
+			const num = step.querySelector(".method-num");
+			const title = step.querySelector(".method-title");
+			const desc = step.querySelector(".method-desc");
+
+			tl.to([num, title], {
+				opacity: 1,
+				x: 0,
+				duration: 0.08,
+				ease: "power2.out"
+			}, start);
+			tl.to(desc, {
+				opacity: 1,
+				y: 0,
+				duration: 0.08,
+				ease: "power2.out"
+			}, start + 0.1);
+		});
+	}
+
+	// ============ PULL QUOTE PIN — оставил как был, кайфовая референс-секция ============
+	function setupPullQuotePin() {
+		const pull = document.querySelector(".pull-quote-pin");
+		if (!pull) return;
+
+		const folio = pull.querySelector(".chapter-folio");
+		const masthead = pull.querySelector(".pq-masthead");
+		const quote = pull.querySelector(".pq-quote");
+		const tagline = pull.querySelector(".pq-tagline");
+		const facts = pull.querySelectorAll(".pq-fact");
+
+		gsap.set(masthead, { opacity: 0, y: 20 });
+		gsap.set(quote, { opacity: 0, y: 60 });
+		gsap.set(tagline, { opacity: 0, y: 40 });
+		gsap.set(facts, { opacity: 0, y: 50 });
+
+		const tl = gsap.timeline({
+			scrollTrigger: {
+				trigger: pull,
+				start: "top top",
+				end: "+=120%",
+				pin: true,
+				scrub: 1
+			}
+		});
+
+		if (folio) tl.to(folio, { yPercent: -10, ease: "none" }, 0);
+		tl.to(masthead, { opacity: 1, y: 0, duration: 0.1, ease: "power2.out" }, 0);
+		tl.to(quote, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 0.15);
+		tl.to(tagline, { opacity: 1, y: 0, duration: 0.15, ease: "power2.out" }, 0.4);
+
+		const taglineWords = setupWordHighlightInTimeline(tagline);
+		tl.to({}, {
+			duration: 0.3,
+			onUpdate: function () {
+				const p = this.progress();
+				const idx = Math.round(p * taglineWords.length);
+				taglineWords.forEach((w, i) => {
+					w.classList.toggle("wh-active", i < idx);
+				});
+			}
+		}, 0.4);
+
+		tl.to(facts, { opacity: 1, y: 0, stagger: 0.08, duration: 0.3, ease: "power2.out" }, 0.7);
+	}
+
+	// ============ TARIF PIN — преимущества → ЦЕНА в финале (мягкая сила) ============
+	function setupTarifPin() {
+		const tarif = document.querySelector(".tarif-pin");
+		if (!tarif) return;
+
+		const header = tarif.querySelector(".tarif-header");
+		const cards = tarif.querySelectorAll(".tarif-card");
+		const prices = tarif.querySelectorAll(".tarif-price");
+		const breakdowns = tarif.querySelectorAll(".tarif-breakdown");
+		const bullets = tarif.querySelectorAll(".tarif-bullet");
+
+		gsap.set(header, { opacity: 0, y: 20 });
+		gsap.set(cards, { opacity: 0, y: 40 });
+		gsap.set(bullets, { opacity: 0, y: 12 });
+		gsap.set(breakdowns, { opacity: 0, y: 16 });
+		gsap.set(prices, { opacity: 0, scale: 0.92 });
+
+		const tl = gsap.timeline({
+			scrollTrigger: {
+				trigger: tarif,
+				start: "top top",
+				end: "+=180%",
+				pin: true,
+				scrub: 1
+			}
+		});
+
+		// 0–0.1: header
+		tl.to(header, { opacity: 1, y: 0, duration: 0.1, ease: "power2.out" }, 0);
+		// 0.1–0.3: 3 карточки появляются (без цен)
+		tl.to(cards, { opacity: 1, y: 0, stagger: 0.08, duration: 0.2, ease: "power2.out" }, 0.1);
+		// 0.3–0.6: буллеты-преимущества проявляются последовательно
+		tl.to(bullets, { opacity: 1, y: 0, stagger: 0.025, duration: 0.15, ease: "power2.out" }, 0.3);
+		// 0.6–0.75: breakdown (только у одной карточки)
+		tl.to(breakdowns, { opacity: 1, y: 0, stagger: 0.05, duration: 0.15, ease: "power2.out" }, 0.6);
+		// 0.8–1.0: ЦЕНЫ в финале — мягкая сила
+		tl.to(prices, { opacity: 1, scale: 1, stagger: 0.1, duration: 0.2, ease: "back.out(1.4)" }, 0.8);
+	}
+
+	/**
+	 * Разбивает текст внутри node на span'ы с классом .wh-word
+	 * (тот же CSS что в actions.js wordHighlight) — но без своего scroll listener,
+	 * прогресс задаётся снаружи через timeline.
+	 *
+	 * @param {Element|null} node
+	 * @returns {HTMLElement[]}
+	 */
+	function setupWordHighlightInTimeline(node) {
+		if (!node) return [];
+		const raw = node.textContent?.trim() || "";
+		const words = raw.split(/\s+/).filter(Boolean);
+		node.innerHTML = "";
+		/** @type {HTMLElement[]} */
+		const spans = [];
+		words.forEach((w, i) => {
+			const span = document.createElement("span");
+			span.className = "wh-word";
+			if (i > 0 && i % 4 === 0) span.dataset.accent = "1";
+			span.textContent = w;
+			node.appendChild(span);
+			spans.push(span);
+			if (i < words.length - 1) node.appendChild(document.createTextNode(" "));
+		});
+		return spans;
+	}
 
 	// ────────────────────────────────────────────────────────────
 	// ВАЖНО: состояние пилотных мест. Обновлять руками при продаже.
@@ -185,12 +402,12 @@
 	</div>
 </section>
 
-<!-- Numbers — на тёмной болотной подкладке, контраст -->
-<section class="section-dark section-rhythm relative px-6 py-20 md:py-24 overflow-hidden">
+<!-- Numbers — на тёмной болотной подкладке, контраст. PIN на десктопе. -->
+<section class="numbers-pin section-dark section-rhythm relative px-6 py-20 md:py-24 overflow-hidden min-h-screen">
 	<div class="chapter-folio chapter-folio-accent" style="top: -4vh; left: -4vw;">II</div>
 
 	<div class="relative max-w-7xl mx-auto w-full">
-		<div class="flex items-center justify-between pb-3 border-b border-current/30" use:reveal>
+		<div class="numbers-header flex items-center justify-between pb-3 border-b border-current/30">
 			<div class="flex items-baseline gap-3">
 				<span class="eyebrow">Глава II</span>
 				<span class="font-display italic text-xl md:text-2xl font-medium">Цифры, которые важны</span>
@@ -200,7 +417,7 @@
 
 		<div class="mt-10 md:mt-16 grid grid-cols-1 md:grid-cols-3 gap-0 border-t border-current/20">
 			<!-- Stat 01 -->
-			<div class="relative p-6 md:p-10 border-b md:border-r border-current/20" use:reveal={{ delay: 100 }}>
+			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-r border-current/20">
 				<div class="eyebrow">01 · отклик</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
 					&lt;<span use:counter={{ target: 1.4, duration: 1600, decimals: 1 }}>0.0</span>
@@ -210,7 +427,7 @@
 				</div>
 			</div>
 			<!-- Stat 02 -->
-			<div class="relative p-6 md:p-10 border-b md:border-r border-current/20" use:reveal={{ delay: 200 }}>
+			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-r border-current/20">
 				<div class="eyebrow">02 · точность</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
 					<span use:counter={{ target: 97, duration: 1600 }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top">%</span>
@@ -220,7 +437,7 @@
 				</div>
 			</div>
 			<!-- Stat 03 -->
-			<div class="relative p-6 md:p-10 border-b border-current/20" use:reveal={{ delay: 300 }}>
+			<div class="numbers-stat relative p-6 md:p-10 border-b border-current/20">
 				<div class="eyebrow">03 · языки</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
 					<span use:counter={{ target: 12, duration: 1600 }}>0</span>
@@ -230,7 +447,7 @@
 				</div>
 			</div>
 			<!-- Stat 04 -->
-			<div class="relative p-6 md:p-10 border-b md:border-b-0 md:border-r border-current/20" use:reveal={{ delay: 400 }}>
+			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-b-0 md:border-r border-current/20">
 				<div class="eyebrow">04 · себестоимость</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
 					~<span use:counter={{ target: 3, duration: 1600 }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top">₽</span>
@@ -240,7 +457,7 @@
 				</div>
 			</div>
 			<!-- Stat 05 -->
-			<div class="relative p-6 md:p-10 border-b md:border-b-0 md:border-r border-current/20" use:reveal={{ delay: 500 }}>
+			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-b-0 md:border-r border-current/20">
 				<div class="eyebrow">05 · пилоты</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none text-accent">
 					{pilotsFree}<span class="text-3xl md:text-5xl align-top text-current">/{PILOTS_TOTAL}</span>
@@ -250,7 +467,7 @@
 				</div>
 			</div>
 			<!-- Stat 06 -->
-			<div class="relative p-6 md:p-10" use:reveal={{ delay: 600 }}>
+			<div class="numbers-stat relative p-6 md:p-10">
 				<div class="eyebrow">06 · кейсы</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
 					0<span class="text-3xl md:text-5xl align-top font-body not-italic font-normal opacity-60 ml-2">пока</span>
@@ -261,7 +478,7 @@
 			</div>
 		</div>
 
-		<p class="font-display italic text-lg md:text-xl mt-12 md:mt-16 max-w-3xl opacity-75 leading-relaxed" use:reveal>
+		<p class="numbers-footer font-display italic text-lg md:text-xl mt-12 md:mt-16 max-w-3xl opacity-75 leading-relaxed">
 			Первые три ресторана — лично, руками. Без пресейла, без агентств, без красивых слов.
 		</p>
 	</div>
@@ -279,30 +496,27 @@
 	</div>
 </section>
 
-<!-- Method — staircase layout -->
-<section id="method" class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden">
+<!-- Method — staircase layout. PIN на десктопе: 4 шага последовательно (заголовок → описание → следующий). -->
+<section id="method" class="method-pin section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden min-h-screen">
 	<div class="chapter-folio" style="bottom: -20vh; right: -6vw;">IV</div>
 
-	<div class="relative flex items-center justify-between pb-3 border-b border-base-content masthead sticky-label" use:reveal>
+	<div class="method-masthead relative flex items-center justify-between pb-3 border-b border-base-content masthead sticky-label">
 		<span>Четыре хода</span>
 		<span>Поток гостя</span>
 	</div>
 
 	<div class="relative grid grid-cols-1 md:grid-cols-2 gap-y-10 md:gap-y-20 gap-x-10 mt-12 md:mt-20">
 		{#each method as [n, title, desc], i (n)}
-			<div
-				class="relative {i % 2 === 1 ? 'md:mt-24' : ''} {i > 0 ? 'md:pl-8' : ''}"
-				use:reveal={{ delay: 100 + i * 140 }}
-			>
+			<div class="method-step relative {i % 2 === 1 ? 'md:mt-24' : ''} {i > 0 ? 'md:pl-8' : ''}">
 				<div class="flex items-start gap-4 md:gap-6">
-					<div class="font-display italic font-medium text-accent leading-none shrink-0" style="font-size: clamp(64px, 10vw, 132px); letter-spacing: -0.04em;">
+					<div class="method-num font-display italic font-medium text-accent leading-none shrink-0" style="font-size: clamp(64px, 10vw, 132px); letter-spacing: -0.04em;">
 						{n}
 					</div>
 					<div class="pt-2 md:pt-4">
-						<h3 class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-[1.05]">
+						<h3 class="method-title font-display italic text-3xl md:text-4xl font-medium text-base-content leading-[1.05]">
 							{title}
 						</h3>
-						<p class="font-body text-[15px] md:text-base text-base-content/80 leading-relaxed mt-4 max-w-sm">
+						<p class="method-desc font-body text-[15px] md:text-base text-base-content/80 leading-relaxed mt-4 max-w-sm">
 							{desc}
 						</p>
 					</div>
@@ -419,27 +633,27 @@
 	</div>
 </section>
 
-<!-- Pull quote — full-screen cinema moment -->
-<section class="section-rhythm relative px-6 py-20 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center">
+<!-- Pull quote — full-screen cinema moment. PIN на десктопе. -->
+<section class="pull-quote-pin section-rhythm relative px-6 py-20 md:py-32 border-b border-base-content/20 overflow-hidden flex flex-col justify-center min-h-screen">
 	<div class="chapter-folio chapter-folio-primary" style="top: -12vh; right: -8vw;">VI</div>
 
 	<div class="relative max-w-7xl mx-auto w-full">
-		<div class="masthead mb-6 md:mb-8" use:reveal>
+		<div class="pq-masthead masthead mb-6 md:mb-8">
 			Главное обещание
 		</div>
 
-		<blockquote class="font-display italic font-medium text-base-content leading-[0.95] max-w-6xl" style="font-size: clamp(44px, 8.5vw, 120px); letter-spacing: -0.03em;" use:reveal={{ delay: 120 }}>
+		<blockquote class="pq-quote font-display italic font-medium text-base-content leading-[0.95] max-w-6xl" style="font-size: clamp(44px, 8.5vw, 120px); letter-spacing: -0.03em;">
 			<span class="text-accent">«</span>Всё, что скажет AI,<br />
 			уже&nbsp;<span class="text-primary">в&nbsp;вашем меню.</span><span class="text-accent">»</span>
 		</blockquote>
 
-		<div class="mt-10 md:mt-14 font-display italic text-base md:text-xl text-base-content/70 max-w-2xl leading-relaxed" use:reveal={{ delay: 280 }}>
-			Ни&nbsp;одного выдуманного блюда. Ни&nbsp;одного несуществующего ингредиента. Ни&nbsp;одного ответа без сверки с&nbsp;картой шефа.
+		<div class="pq-tagline mt-10 md:mt-14 font-display italic text-base md:text-xl max-w-2xl leading-relaxed">
+			Ни одного выдуманного блюда. Ни одного несуществующего ингредиента. Ни одного ответа без сверки с картой шефа.
 		</div>
 
 		<!-- 3 факт-подпорки: раскрывают обещание конкретикой -->
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-14 md:mt-20 border-y border-base-content/25">
-			<div class="p-6 md:p-8 border-b md:border-b-0 md:border-r border-base-content/25" use:reveal={{ delay: 400 }}>
+			<div class="pq-fact p-6 md:p-8 border-b md:border-b-0 md:border-r border-base-content/25">
 				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">01 · источник</div>
 				<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-tight">
 					Из меню шефа
@@ -448,7 +662,7 @@
 					AI читает только ваш JSON-каталог. Если блюда нет в карте — его нет и в ответе.
 				</div>
 			</div>
-			<div class="p-6 md:p-8 border-b md:border-b-0 md:border-r border-base-content/25" use:reveal={{ delay: 500 }}>
+			<div class="pq-fact p-6 md:p-8 border-b md:border-b-0 md:border-r border-base-content/25">
 				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">02 · сверка</div>
 				<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-tight">
 					97&nbsp;% точность
@@ -457,7 +671,7 @@
 					Отдельная модель-верификатор проверяет состав, аллергены и цены перед каждой отправкой гостю.
 				</div>
 			</div>
-			<div class="p-6 md:p-8" use:reveal={{ delay: 600 }}>
+			<div class="pq-fact p-6 md:p-8">
 				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">03 · скорость</div>
 				<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-tight">
 					1,4&nbsp;секунды
@@ -576,11 +790,11 @@
 </section>
 
 <!-- Tariffs -->
-<section id="tarif" class="section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden">
+<section id="tarif" class="tarif-pin section-rhythm relative px-6 py-20 md:py-24 border-b border-base-content/20 overflow-hidden min-h-screen">
 	<div class="chapter-folio chapter-folio-primary" style="top: -10vh; left: -5vw;">$</div>
 
 	<div class="relative max-w-5xl mx-auto w-full">
-		<div class="flex items-center justify-between pb-3 border-b border-base-content masthead" use:reveal>
+		<div class="tarif-header flex items-center justify-between pb-3 border-b border-base-content masthead">
 			<div class="flex items-baseline gap-3">
 				<span class="eyebrow">Глава VI</span>
 				<span class="font-display italic text-xl md:text-2xl font-medium text-base-content">Три пакета</span>
@@ -590,10 +804,7 @@
 
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-10 md:mt-14 border border-base-content/25">
 			{#each tariffs as p, i (p.n)}
-				<div
-					class="relative p-7 md:p-8 border-b md:border-b-0 md:border-r border-base-content/20 last:border-b-0 md:last:border-r-0 transition-all duration-500 hover:bg-base-100 group overflow-hidden"
-					use:reveal={{ delay: 150 + i * 150 }}
-				>
+				<div class="tarif-card relative p-7 md:p-8 border-b md:border-b-0 md:border-r border-base-content/20 last:border-b-0 md:last:border-r-0 transition-all duration-500 hover:bg-base-100 group overflow-hidden">
 					<!-- Верхняя линия-акцент появляется плавно при hover — равноправно для всех -->
 					<div class="absolute top-0 left-0 right-0 h-[3px] bg-accent transition-transform duration-500 scale-x-0 group-hover:scale-x-100" style="transform-origin: left center;"></div>
 
@@ -601,7 +812,7 @@
 					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content mt-2 transition-transform duration-500 group-hover:translate-x-1">{p.name}</div>
 					<div class="font-display italic text-sm text-base-content/70 mt-2 leading-snug min-h-[2.6em]">{p.sub}</div>
 
-					<div class="flex items-baseline gap-1.5 mt-6">
+					<div class="tarif-price flex items-baseline gap-1.5 mt-6">
 						<div class="font-mono tabular text-[44px] md:text-[52px] font-medium text-base-content leading-none">{p.price}</div>
 						{#if p.price !== "—" && p.price !== "0"}
 							<div class="font-body text-[13px] text-base-content/60">₽ / мес</div>
@@ -611,14 +822,14 @@
 					<div class="border-t border-dotted border-base-content/30 my-5 md:my-6"></div>
 
 					{#each p.bullets as b (b)}
-						<div class="flex gap-2.5 py-1.5 text-sm md:text-[15px] text-base-content/85 leading-snug">
+						<div class="tarif-bullet flex gap-2.5 py-1.5 text-sm md:text-[15px] text-base-content/85 leading-snug">
 							<span class="font-mono text-accent text-[11px] pt-1 shrink-0">·</span>
 							<span>{b}</span>
 						</div>
 					{/each}
 
 					{#if p.breakdown}
-						<div class="mt-6 pt-5 border-t border-dotted border-base-content/30">
+						<div class="tarif-breakdown mt-6 pt-5 border-t border-dotted border-base-content/30">
 							<div class="font-mono tabular text-[10px] text-base-content/50 tracking-[0.18em] mb-3">
 								ИЗ ЧЕГО СКЛАДЫВАЕТСЯ
 							</div>

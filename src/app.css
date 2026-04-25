@@ -110,6 +110,26 @@ html, body {
 	transform: translateY(0);
 }
 
+/* Word Highlight — слова «печатаются жирным» по мере скролла.
+   Стартовое состояние читаемое (45%) — пользователь видит весь текст,
+   но плотность букв ниже. По мере скролла слова наливаются весом и цветом. */
+.wh-word {
+	color: color-mix(in srgb, var(--color-base-content) 45%, transparent);
+	font-weight: 400;
+	font-variation-settings: "wght" 400;
+	transition: color 0.45s cubic-bezier(0.2, 0.6, 0.2, 1),
+		font-weight 0.45s cubic-bezier(0.2, 0.6, 0.2, 1),
+		font-variation-settings 0.45s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.wh-word.wh-active {
+	color: var(--color-base-content);
+	font-weight: 600;
+	font-variation-settings: "wght" 600;
+}
+.wh-word.wh-active[data-accent] {
+	color: var(--color-accent);
+}
+
 /* Hover underline для ссылок */
 @layer utilities {
 	.link-underline {

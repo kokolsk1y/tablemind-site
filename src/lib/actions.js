@@ -1,31 +1,59 @@
 // Svelte actions для интерактива сайта.
-// Все используют IntersectionObserver + CSS transitions — никаких тяжёлых зависимостей.
+// reveal/wordHighlight используют GSAP ScrollTrigger для центр-симметричного
+// scrub'а — блоки плавно появляются и откатываются вокруг центра viewport.
+// parallaxBg/counter/typingSequence/horizontalScroll используют IntersectionObserver.
+
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+	gsap.registerPlugin(ScrollTrigger);
+}
 
 /**
- * Scroll-reveal: добавляет класс .revealed когда элемент попадает в viewport.
- * Параметр delay (ms) — staggered-задержка перед появлением.
+ * Scroll-reveal: блок плавно появляется когда подходит к центру viewport,
+ * и откатывается обратно при скролле вверх. Симметричная подача вокруг центра.
+ *
+ * Прогресс через ScrollTrigger scrub:
+ *   start: top 85%   — блок только-только показался снизу (opacity 0)
+ *   end:   top 45%   — блок прошёл ~центр viewport (opacity 1, остаётся)
+ *
+ * Ниже end — блок уже виден на 100% и остаётся видимым (не гаснет когда уходит наверх).
+ * Выше start — блок невидим. Между ними — scrub-плавный переход.
+ *
+ * options:
+ *   delay  — staggered-задержка для последовательных блоков (ms)
+ *   fromY  — стартовый offset по Y в px (default 32)
  */
 export function reveal(node, options = {}) {
-	const { delay = 0, threshold = 0.15 } = options;
+	const { delay = 0, fromY = 32 } = options;
 	node.classList.add("reveal");
-	if (delay) node.style.transitionDelay = `${delay}ms`;
 
-	const obs = new IntersectionObserver(
-		(entries) => {
-			entries.forEach((e) => {
-				if (e.isIntersecting) {
-					node.classList.add("revealed");
-					obs.unobserve(node);
-				}
-			});
-		},
-		{ threshold, rootMargin: "0px 0px -60px 0px" }
+	// delay сдвигает только startTrigger — block появляется чуть позже соседей.
+	// Каждые 100ms задержки = +3% сверху на старте (соседи появляются веером).
+	const startOffset = Math.min(12, Math.max(0, delay / 100) * 3);
+	const startPct = 85 + startOffset;
+
+	const tween = gsap.fromTo(
+		node,
+		{ opacity: 0, y: fromY },
+		{
+			opacity: 1,
+			y: 0,
+			ease: "power2.out",
+			scrollTrigger: {
+				trigger: node,
+				start: `top ${startPct}%`,
+				end: "top 45%",
+				scrub: 0.6
+			}
+		}
 	);
-	obs.observe(node);
 
 	return {
 		destroy() {
-			obs.disconnect();
+			tween.scrollTrigger?.kill();
+			tween.kill();
 		}
 	};
 }
@@ -208,6 +236,88 @@ export function horizontalScroll(node, options = {}) {
 		destroy() {
 			window.removeEventListener("scroll", throttled);
 			window.removeEventListener("resize", throttled);
+		}
+	};
+}
+
+/**
+ * Word Highlight on Scroll — текст «печатается жирным» по мере скролла.
+ * Прогресс привязан к ЦЕНТРУ параграфа относительно ЦЕНТРА viewport — именно туда
+ * смотрит пользователь. Когда центр параграфа достигает центра экрана — все слова
+ * подсвечены. Когда параграф уехал выше центра — остаётся подсвеченным (по умолчанию
+ * текст не «разжиривается» обратно — это было бы шумом на информативном сайте).
+ *
+ * options:
+ *   accentEvery — каждое N-е слово красится в --color-accent (default 4, 0/false — выкл.)
+ *   reverse — true → слова гаснут обратно при скролле вверх (default false: один раз и остаётся)
+ */
+export function wordHighlight(node, options = {}) {
+	const { accentEvery = 4, reverse = false } = options;
+
+	const raw = node.textContent?.trim() || "";
+	const words = raw.split(/\s+/).filter(Boolean);
+	node.innerHTML = "";
+	/** @type {HTMLElement[]} */
+	const spans = [];
+	words.forEach((w, i) => {
+		const span = document.createElement("span");
+		span.className = "wh-word";
+		if (accentEvery && i > 0 && i % accentEvery === 0) {
+			span.dataset.accent = "1";
+		}
+		span.textContent = w;
+		node.appendChild(span);
+		spans.push(span);
+		if (i < words.length - 1) node.appendChild(document.createTextNode(" "));
+	});
+
+	let visible = false;
+	let maxProgress = 0; // запоминаем достигнутый максимум — для не-реверсивного режима
+	const obs = new IntersectionObserver(
+		([e]) => {
+			visible = e.isIntersecting;
+		},
+		{ threshold: 0, rootMargin: "200px 0px 200px 0px" }
+	);
+	obs.observe(node);
+
+	let raf = 0;
+	function onScroll() {
+		if (!visible) return;
+		const rect = node.getBoundingClientRect();
+		const vh = window.innerHeight;
+		const mid = rect.top + rect.height / 2;
+		// 0 когда центр параграфа = низ viewport (vh)
+		// 1 когда центр параграфа = центр viewport (vh/2)
+		// Дальше (mid < vh/2) — clamp 1
+		const range = vh / 2;
+		const raw = (vh - mid) / range;
+		const progress = Math.max(0, Math.min(1, raw));
+
+		const effective = reverse ? progress : Math.max(progress, maxProgress);
+		if (!reverse) maxProgress = effective;
+
+		const activeIndex = Math.round(effective * spans.length);
+		spans.forEach((s, i) => {
+			s.classList.toggle("wh-active", i < activeIndex);
+		});
+	}
+
+	function tick() {
+		cancelAnimationFrame(raf);
+		raf = requestAnimationFrame(onScroll);
+	}
+
+	onScroll();
+	window.addEventListener("scroll", tick, { passive: true });
+	window.addEventListener("resize", tick);
+
+	return {
+		destroy() {
+			obs.disconnect();
+			cancelAnimationFrame(raf);
+			window.removeEventListener("scroll", tick);
+			window.removeEventListener("resize", tick);
 		}
 	};
 }
