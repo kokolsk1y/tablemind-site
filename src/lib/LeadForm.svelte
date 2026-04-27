@@ -1,5 +1,9 @@
 <script>
-	const API_URL = "https://table-mind-seven.vercel.app/api/notify";
+	// URL Yandex Cloud Function (notify). Подставляется при build из GitHub Secret PUBLIC_API_URL.
+	// Vite автоматически проксирует все env-переменные с префиксом PUBLIC_ в бандл.
+	// Локально для разработки положить в .env.local: PUBLIC_API_URL=https://...
+	// Fallback на старый Vercel-URL — на случай если secret ещё не настроен.
+	const API_URL = import.meta.env.PUBLIC_API_URL || "https://table-mind-seven.vercel.app/api/notify";
 
 	/** @type {"idle" | "sending" | "ok" | "error"} */
 	let status = $state("idle");

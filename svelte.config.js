@@ -1,21 +1,19 @@
-import adapterAuto from "@sveltejs/adapter-auto";
-import adapterStatic from "@sveltejs/adapter-static";
+import adapter from "@sveltejs/adapter-static";
 
-// На Vercel (Linux) adapter-auto детектит окружение и подставляет adapter-vercel.
-// Локально на Windows adapter-vercel падает из-за symlink, поэтому для local build
-// используем adapter-static. На Vercel будет prerendered static + SSR где нужен.
-const isVercel = Boolean(process.env.VERCEL);
+// Деплой: GitHub Pages с custom domain tablemind.ru.
+// paths.base пустой — фронт раздаётся с корня домена (не из подпапки /tablemind-site).
+// Если когда-нибудь захотим уйти с custom domain на kokolsk1y.github.io/tablemind-site —
+// поменять base на "/tablemind-site".
 
 const config = {
 	kit: {
-		adapter: isVercel
-			? adapterAuto()
-			: adapterStatic({
-					pages: "build",
-					assets: "build",
-					fallback: "404.html",
-					strict: false
-			  })
+		adapter: adapter({
+			pages: "build",
+			assets: "build",
+			fallback: "404.html",
+			strict: false
+		}),
+		appDir: "app"
 	}
 };
 
