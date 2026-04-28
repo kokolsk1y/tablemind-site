@@ -17,7 +17,7 @@
 </script>
 
 <svelte:head>
-	<title>TableMind — AI-официант для ресторанов</title>
+	<title>TableMind — QR-меню с AI для ресторанов</title>
 </svelte:head>
 
 <!-- Scroll progress — тонкая охровая полоса сверху -->

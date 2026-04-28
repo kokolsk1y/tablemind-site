@@ -79,12 +79,12 @@
 		const nums = document.querySelector(".numbers-pin");
 		if (!nums) return;
 
-		const header = nums.querySelector(".numbers-header");
 		const stats = nums.querySelectorAll(".numbers-stat");
 		const footer = nums.querySelector(".numbers-footer");
 		const folio = nums.querySelector(".chapter-folio");
+		const hint = nums.querySelector(".scroll-hint");
 
-		gsap.set(header, { opacity: 0, y: 30 });
+		// Header теперь НЕ скрываем — юзер сразу видит «Глава II · Цифры» и понимает где он.
 		gsap.set(stats, { opacity: 0, y: 50 });
 		if (footer) gsap.set(footer, { opacity: 0, y: 30 });
 
@@ -104,9 +104,8 @@
 			}
 		});
 
-		// Header появляется → пауза для прочтения главы → потом stats.
-		tl.to(header, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
-		tl.to({}, { duration: 0.4 }); // hold — читаем «Цифры, которые важны»
+		// Scroll-hint исчезает в самом начале — как только юзер начал скроллить.
+		if (hint) tl.to(hint, { opacity: 0, duration: 0.15, ease: "power2.out" });
 
 		// Каждый stat: появление (0.3) + hold (0.5). Триггерим counter в момент появления.
 		stats.forEach((stat) => {
@@ -139,11 +138,11 @@
 		const method = document.querySelector(".method-pin");
 		if (!method) return;
 
-		const masthead = method.querySelector(".method-masthead");
 		const steps = method.querySelectorAll(".method-step");
 		const folio = method.querySelector(".chapter-folio");
+		const hint = method.querySelector(".scroll-hint");
 
-		gsap.set(masthead, { opacity: 0, y: 20 });
+		// Masthead теперь НЕ скрываем — юзер сразу видит «Четыре хода / Поток гостя».
 		steps.forEach((step) => {
 			const num = step.querySelector(".method-num");
 			const title = step.querySelector(".method-title");
@@ -168,8 +167,8 @@
 			}
 		});
 
-		tl.to(masthead, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
-		tl.to({}, { duration: 0.3 }); // hold — masthead прочитан
+		// Scroll-hint исчезает сразу как только юзер начал скроллить.
+		if (hint) tl.to(hint, { opacity: 0, duration: 0.15, ease: "power2.out" });
 
 		// Каждый шаг: римская+заголовок (0.3) → hold (0.4) → описание (0.3) → hold (0.7).
 		// На последнем шаге БЕЗ финального hold — pin отпускается сразу.
@@ -194,12 +193,12 @@
 		if (!pull) return;
 
 		const folio = pull.querySelector(".chapter-folio");
-		const masthead = pull.querySelector(".pq-masthead");
 		const quote = pull.querySelector(".pq-quote");
 		const tagline = pull.querySelector(".pq-tagline");
 		const facts = pull.querySelectorAll(".pq-fact");
+		const hint = pull.querySelector(".scroll-hint");
 
-		gsap.set(masthead, { opacity: 0, y: 20 });
+		// Masthead теперь НЕ скрываем — юзер сразу видит «Главное обещание».
 		gsap.set(quote, { opacity: 0, y: 60 });
 		gsap.set(tagline, { opacity: 0, y: 40 });
 		gsap.set(facts, { opacity: 0, y: 50 });
@@ -219,7 +218,8 @@
 		});
 
 		if (folio) tl.to(folio, { yPercent: -10, ease: "none" }, 0);
-		tl.to(masthead, { opacity: 1, y: 0, duration: 0.1, ease: "power2.out" }, 0);
+		// Scroll-hint исчезает сразу как только юзер начал скроллить.
+		if (hint) tl.to(hint, { opacity: 0, duration: 0.15, ease: "power2.out" }, 0);
 		tl.to(quote, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 0.15);
 		tl.to(tagline, { opacity: 1, y: 0, duration: 0.15, ease: "power2.out" }, 0.4);
 
@@ -243,14 +243,14 @@
 		const tarif = document.querySelector(".tarif-pin");
 		if (!tarif) return;
 
-		const header = tarif.querySelector(".tarif-header");
 		const cards = tarif.querySelectorAll(".tarif-card");
 		const prices = tarif.querySelectorAll(".tarif-price");
 		const breakdowns = tarif.querySelectorAll(".tarif-breakdown");
 		const bullets = tarif.querySelectorAll(".tarif-bullet");
 		const folio = tarif.querySelector(".chapter-folio");
+		const hint = tarif.querySelector(".scroll-hint");
 
-		gsap.set(header, { opacity: 0, y: 20 });
+		// Header теперь НЕ скрываем — юзер сразу видит «Глава VI · Три пакета».
 		gsap.set(cards, { opacity: 0, y: 40 });
 		gsap.set(bullets, { opacity: 0, y: 12 });
 		gsap.set(breakdowns, { opacity: 0, y: 16 });
@@ -270,9 +270,8 @@
 			}
 		});
 
-		// Header → hold для прочтения главы
-		tl.to(header, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
-		tl.to({}, { duration: 0.3 });
+		// Scroll-hint исчезает сразу как только юзер начал скроллить.
+		if (hint) tl.to(hint, { opacity: 0, duration: 0.15, ease: "power2.out" });
 
 		// 3 карточки → hold чтобы рассмотреть структуру
 		tl.to(cards, { opacity: 1, y: 0, stagger: 0.15, duration: 0.4, ease: "power2.out" });
@@ -358,10 +357,10 @@
 	const today = new Date();
 
 	const method = [
-		["I", "QR на столе", "Гость открывает PWA за <2 сек. Никаких установок, никаких аккаунтов."],
-		["II", "Разговор", "Голосом или текстом, на русском или своём. AI знает меню шефа наизусть."],
-		["III", "Верификатор", "Прежде чем ответить — сверяется с картой. Не придумает того, чего нет."],
-		["IV", "Живой официант", "Если нужно — зовёт человека в ваш Telegram со столом и контекстом."]
+		["I", "QR-меню без приложения", "Гость сканирует QR со стола — и за 2 секунды видит вашу карту. Ничего скачивать, никаких аккаунтов."],
+		["II", "12 языков с голосом", "Турист читает на родном, спрашивает про состав и аллергены — голосом или текстом. AI знает меню шефа наизусть."],
+		["III", "Подбирает и допродаёт", "Квиз ведёт гостя к комплексу из ваших блюд. Средний чек растёт — без работы официанта."],
+		["IV", "Зовёт официанта одним тапом", "Уведомление прилетает в ваш мессенджер — Telegram, VK Max или WhatsApp — со столом и контекстом разговора."]
 	];
 
 	const tariffs = [
@@ -373,7 +372,7 @@
 			bullets: [
 				"Ваше меню — настраиваю сам",
 				"До 30 столов",
-				"Telegram-бот в подарок",
+				"Бот для оповещений в подарок",
 				"AI-токены OpenRouter оплачиваю я"
 			]
 		},
@@ -383,6 +382,7 @@
 			price: "9 900",
 			sub: "после пилота — техфи за работу сервиса",
 			bullets: [
+				"Меню на 12+ языках для туристов",
 				"Хостинг, AI-токены, домен и SSL",
 				"Обновление меню раз в 2 месяца",
 				"Мониторинг аптайма и фиксы",
@@ -424,7 +424,7 @@
 		<a href="/" class="justify-self-start flex items-center gap-3 group">
 			<img
 				src="/logo.png"
-				alt="TableMind — AI-официант"
+				alt="TableMind — QR-меню с AI"
 				width="64"
 				height="64"
 				class="w-14 h-14 md:w-16 md:h-16 object-contain transition-transform duration-500 group-hover:scale-[1.06]"
@@ -475,7 +475,7 @@
 				class="font-body text-base md:text-lg text-base-content/80 max-w-xl leading-relaxed"
 				use:reveal={{ delay: 220 }}
 			>
-				Гость сканирует QR со стола — и получает собеседника, который рассказывает о блюдах голосом и текстом, подбирает комплексы, зовёт живого официанта в Telegram, если нужно.
+				QR-меню на 12 языках с собеседником-AI на борту. Турист читает на родном, выбирает по подсказке, зовёт официанта одним касанием — уведомление прилетает в ваш мессенджер. AI учится на вашем меню — и со временем становится частью бренда.
 			</p>
 			<div class="hero-cta-block flex flex-wrap gap-3">
 				<a
@@ -514,15 +514,23 @@
 			<span class="masthead hidden sm:inline">Что проверено</span>
 		</div>
 
+		<!-- Scroll hint — виден до старта pin-таймлайна, чтобы юзер не подумал что страница не загрузилась -->
+		<div class="scroll-hint hidden md:flex items-center gap-3 mt-6 masthead opacity-80">
+			<span class="inline-block w-2 h-2 bg-accent rounded-full pulse-dot"></span>
+			<span>скроллите вниз — цифры раскроются по очереди</span>
+			<div class="flex-1 h-px bg-current/20"></div>
+			<span class="font-display italic text-base opacity-70">↓</span>
+		</div>
+
 		<div class="mt-10 md:mt-16 grid grid-cols-1 md:grid-cols-3 gap-0 border-t border-current/20">
 			<!-- Stat 01 -->
 			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-r border-current/20">
-				<div class="eyebrow">01 · отклик</div>
+				<div class="eyebrow">01 · языки</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
-					&lt;<span use:counter={{ target: 1.4, duration: 1600, decimals: 1, manual: true }}>0.0</span>
+					<span use:counter={{ target: 12, duration: 1600, manual: true }}>0</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
-					секунд — средний ответ AI на вопрос гостя
+					языков читает турист и говорит голосом — авто-детект
 				</div>
 			</div>
 			<!-- Stat 02 -->
@@ -537,12 +545,12 @@
 			</div>
 			<!-- Stat 03 -->
 			<div class="numbers-stat relative p-6 md:p-10 border-b border-current/20">
-				<div class="eyebrow">03 · языки</div>
+				<div class="eyebrow">03 · отклик</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
-					<span use:counter={{ target: 12, duration: 1600, manual: true }}>0</span>
+					&lt;<span use:counter={{ target: 1.4, duration: 1600, decimals: 1, manual: true }}>0.0</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
-					языков понимает голосом и текстом — авто-детект
+					секунд — средний ответ AI на вопрос гостя
 				</div>
 			</div>
 			<!-- Stat 04 -->
@@ -602,6 +610,14 @@
 	<div class="method-masthead relative flex items-center justify-between pb-3 border-b border-base-content masthead sticky-label">
 		<span>Четыре хода</span>
 		<span>Поток гостя</span>
+	</div>
+
+	<!-- Scroll hint — виден до старта pin-таймлайна -->
+	<div class="scroll-hint hidden md:flex items-center gap-3 mt-6 masthead opacity-80">
+		<span class="inline-block w-2 h-2 bg-accent rounded-full pulse-dot"></span>
+		<span>скроллите вниз — четыре хода развернутся один за другим</span>
+		<div class="flex-1 h-px bg-base-content/20"></div>
+		<span class="font-display italic text-base text-base-content/70">↓</span>
 	</div>
 
 	<div class="relative grid grid-cols-1 md:grid-cols-2 gap-y-10 md:gap-y-20 gap-x-10 mt-12 md:mt-20">
@@ -739,6 +755,14 @@
 	<div class="relative max-w-7xl mx-auto w-full">
 		<div class="pq-masthead masthead mb-6 md:mb-8">
 			Главное обещание
+		</div>
+
+		<!-- Scroll hint — виден до старта pin-таймлайна -->
+		<div class="scroll-hint hidden md:flex items-center gap-3 mb-6 masthead opacity-80">
+			<span class="inline-block w-2 h-2 bg-accent rounded-full pulse-dot"></span>
+			<span>скроллите вниз — обещание раскрывается</span>
+			<div class="flex-1 h-px bg-base-content/20"></div>
+			<span class="font-display italic text-base text-base-content/70">↓</span>
 		</div>
 
 		<blockquote class="pq-quote font-display italic font-medium text-base-content leading-[0.95] max-w-6xl" style="font-size: clamp(44px, 8.5vw, 120px); letter-spacing: -0.03em;">
@@ -899,6 +923,14 @@
 				<span class="font-display italic text-xl md:text-2xl font-medium text-base-content">Три пакета</span>
 			</div>
 			<span>₽ / месяц</span>
+		</div>
+
+		<!-- Scroll hint — виден до старта pin-таймлайна -->
+		<div class="scroll-hint hidden md:flex items-center gap-3 mt-6 masthead opacity-80">
+			<span class="inline-block w-2 h-2 bg-accent rounded-full pulse-dot"></span>
+			<span>скроллите вниз — три тарифа развернутся с разбивкой по цене</span>
+			<div class="flex-1 h-px bg-base-content/20"></div>
+			<span class="font-display italic text-base text-base-content/70">↓</span>
 		</div>
 
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-10 md:mt-14 border border-base-content/25">
