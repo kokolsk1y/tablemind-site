@@ -37,7 +37,6 @@
 				setupNumbersPin();
 				setupMethodPin();
 				setupPullQuotePin();
-				setupTarifPin();
 			} catch (err) {
 				console.error("Pin setup failed, restoring visibility:", err);
 				restoreVisibility();
@@ -238,57 +237,10 @@
 		tl.to(facts, { opacity: 1, y: 0, stagger: 0.08, duration: 0.3, ease: "power2.out" }, 0.7);
 	}
 
-	// ============ TARIF PIN — преимущества → ЦЕНА → breakdown («как разложили») ============
-	function setupTarifPin() {
-		const tarif = document.querySelector(".tarif-pin");
-		if (!tarif) return;
-
-		const cards = tarif.querySelectorAll(".tarif-card");
-		const prices = tarif.querySelectorAll(".tarif-price");
-		const breakdowns = tarif.querySelectorAll(".tarif-breakdown");
-		const bullets = tarif.querySelectorAll(".tarif-bullet");
-		const folio = tarif.querySelector(".chapter-folio");
-		const hint = tarif.querySelector(".scroll-hint");
-
-		// Header теперь НЕ скрываем — юзер сразу видит «Глава VI · Три пакета».
-		gsap.set(cards, { opacity: 0, y: 40 });
-		gsap.set(bullets, { opacity: 0, y: 12 });
-		gsap.set(breakdowns, { opacity: 0, y: 16 });
-		gsap.set(prices, { opacity: 0, scale: 0.92 });
-
-		const tl = gsap.timeline({
-			scrollTrigger: {
-				trigger: tarif,
-				start: "top top",
-				end: "+=300%",
-				pin: true,
-				scrub: 1,
-				anticipatePin: 1,
-				onLeave: () => {
-					if (folio) gsap.set(folio, { clearProps: "transform" });
-				}
-			}
-		});
-
-		// Scroll-hint исчезает сразу как только юзер начал скроллить.
-		if (hint) tl.to(hint, { opacity: 0, duration: 0.15, ease: "power2.out" });
-
-		// 3 карточки → hold чтобы рассмотреть структуру
-		tl.to(cards, { opacity: 1, y: 0, stagger: 0.15, duration: 0.4, ease: "power2.out" });
-		tl.to({}, { duration: 0.5 });
-
-		// Преимущества последовательно → долгий hold для чтения списка
-		tl.to(bullets, { opacity: 1, y: 0, stagger: 0.04, duration: 0.3, ease: "power2.out" });
-		tl.to({}, { duration: 1.0 });
-
-		// ЦЕНА — кульминация! После того как пользователь прочитал ВСЕ преимущества.
-		tl.to(prices, { opacity: 1, scale: 1, stagger: 0.15, duration: 0.4, ease: "back.out(1.4)" });
-		tl.to({}, { duration: 0.6 }); // hold чтобы осознать цену
-
-		// Breakdown — «а вот как разложили» — после цены показываем что не с потолка
-		tl.to(breakdowns, { opacity: 1, y: 0, stagger: 0.1, duration: 0.3, ease: "power2.out" });
-		// Без финального hold — pin отпускается сразу
-	}
+	// setupTarifPin удалён 2026-04-30: после переработки карточек на интерактивные
+	// features классы .tarif-bullet/.tarif-breakdown больше не существуют. Тарифы
+	// теперь раскрываются обычным скроллом — этого достаточно для секции с 4-мя
+	// карточками одинаковой высоты, доп.услугами и CTA.
 
 	/**
 	 * Разбивает текст внутри node на span'ы с классом .wh-word
@@ -302,13 +254,20 @@
 		if (!node) return [];
 		const raw = node.textContent?.trim() || "";
 		const words = raw.split(/\s+/).filter(Boolean);
+		// Если задан data-accent-words — подсвечиваем именно эти индексы (через запятую).
+		// Иначе fallback: каждое 4-е слово (как было исторически).
+		const accentAttr = node.dataset?.accentWords;
+		const accentSet = accentAttr
+			? new Set(accentAttr.split(",").map((s) => parseInt(s.trim(), 10)).filter((n) => !isNaN(n)))
+			: null;
 		node.innerHTML = "";
 		/** @type {HTMLElement[]} */
 		const spans = [];
 		words.forEach((w, i) => {
 			const span = document.createElement("span");
 			span.className = "wh-word";
-			if (i > 0 && i % 4 === 0) span.dataset.accent = "1";
+			const isAccent = accentSet ? accentSet.has(i) : (i > 0 && i % 4 === 0);
+			if (isAccent) span.dataset.accent = "1";
 			span.textContent = w;
 			node.appendChild(span);
 			spans.push(span);
@@ -329,11 +288,11 @@
 
 	// Архитектура — как устроен продукт внутри
 	const arch = [
-		{ roman: "I", label: "Гость", desc: "QR на столе", icon: "QR" },
-		{ roman: "II", label: "PWA", desc: "меню в браузере", icon: "T" },
-		{ roman: "III", label: "AI-агент", desc: "Claude Haiku", icon: "AI" },
+		{ roman: "I", label: "Гость", desc: "QR со стола или киоск у кассы", icon: "QR" },
+		{ roman: "II", label: "PWA", desc: "меню в браузере или фуллскрин", icon: "T" },
+		{ roman: "III", label: "AI-агент", desc: "Claude Haiku 4.5", icon: "AI" },
 		{ roman: "IV", label: "Верификатор", desc: "сверяется с картой", icon: "✓" },
-		{ roman: "V", label: "Telegram", desc: "зовёт официанта", icon: "TG" }
+		{ roman: "V", label: "Дашборд", desc: "уведомление персоналу", icon: "ST" }
 	];
 
 	// Живой diálogo — раскрывается typing-анимацией
@@ -345,7 +304,7 @@
 		{ who: "guest", label: "ГОСТЬ", text: "А аллергены?" },
 		{ who: "ai", label: "Тим", text: "В карпаччо — орехи и молочное. В крем-супе — орехи. Предупрежу кухню." },
 		{ who: "guest", label: "ГОСТЬ", text: "Позови официанта" },
-		{ who: "ai", label: "Тим", text: "→ Отправил Илье в Telegram. Он подойдёт через 1–2 минуты." }
+		{ who: "ai", label: "Тим", text: "→ Отправил Илье на дашборд. Подойдёт через 1–2 минуты." }
 	];
 	let dialogueActiveIndex = $state(-1);
 
@@ -357,58 +316,113 @@
 	const today = new Date();
 
 	const method = [
-		["I", "QR-меню без приложения", "Гость сканирует QR со стола — и за 2 секунды видит вашу карту. Ничего скачивать, никаких аккаунтов."],
-		["II", "12 языков с голосом", "Турист читает на родном, спрашивает про состав и аллергены — голосом или текстом. AI знает меню шефа наизусть."],
-		["III", "Подбирает и допродаёт", "Квиз ведёт гостя к комплексу из ваших блюд. Средний чек растёт — без работы официанта."],
-		["IV", "Зовёт официанта одним тапом", "Уведомление прилетает в ваш мессенджер — Telegram, VK Max или WhatsApp — со столом и контекстом разговора."]
+		["I", "QR со стола или киоск у кассы", "Гость сканирует QR на телефоне — или подходит к планшету ресторана. Меню открывается мгновенно. Без приложений и аккаунтов."],
+		["II", "12 языков с голосом", "Турист читает и спрашивает голосом на родном языке. AI отвечает на немецком, польском, литовском — без участия официанта."],
+		["III", "+15–20 % к среднему чеку", "Квиз ведёт гостя к комплексу. К каждому блюду — автоматическая допродажа. Без работы официанта, измеримо с первого месяца."],
+		["IV", "Уведомление в ваш дашборд", "Гость зовёт персонал одним тапом. Заявка прилетает в наш дашборд /staff — на любое устройство, без установки приложения."]
 	];
 
 	const tariffs = [
 		{
 			n: "I",
-			name: "Пилот",
-			price: "0",
-			sub: "первые 3 ресторана · настройка руками",
-			bullets: [
-				"Ваше меню — настраиваю сам",
-				"До 30 столов",
-				"Бот для оповещений в подарок",
-				"AI-токены OpenRouter оплачиваю я"
+			name: "Лавка",
+			price: "1 990",
+			features: [
+				{ label: "Меню на 12 языках", detail: "Турист сам читает на родном — продавец не объясняет состав на ломаном английском." },
+				{ label: "Логотип и цвета за 1 час", detail: "Подгоняем под ваш стиль за один созвон. Без отдельного дизайнера." },
+				{ label: "Запуск за 1 день", detail: "Я подключаю меню утром — к вечеру у вас QR-код на стойке. Не неделя, не месяц — один рабочий день." },
+				{ label: "Хостинг и SSL включены", detail: "Не платите за серверы, домен и SSL — всё внутри 1 990 ₽. Сайт работает у нас." },
+				{ label: "Ответ за 24 часа", detail: "Любой вопрос — отвечаю лично за сутки. Не бот, не агентство." }
+			],
+			extras: [
+				{ label: "Парсинг меню", price: "бесплатно", detail: "Забираю с вашего сайта или PDF и заливаю сам — не вбиваете 50 позиций руками." }
 			]
 		},
 		{
 			n: "II",
 			name: "Кафе",
-			price: "9 900",
-			sub: "после пилота — техфи за работу сервиса",
-			bullets: [
-				"Меню на 12+ языках для туристов",
-				"Хостинг, AI-токены, домен и SSL",
-				"Обновление меню раз в 2 месяца",
-				"Мониторинг аптайма и фиксы",
-				"Email-поддержка до 24 ч"
+			price: "5 900",
+			features: [
+				{ label: "Всё из «Лавки»", detail: "Языки, бренд, запуск за день, хостинг, поддержка." },
+				{ label: "AI отвечает 100% вопросов", detail: "«Острое?», «Без глютена?», «Что с вином?» — гость спрашивает в чате, AI отвечает мгновенно. Без официанта." },
+				{ label: "Квиз → +15–20% к чеку", detail: "Гость отвечает на 5 вопросов — получает готовый набор из вашего меню. Чек растёт измеримо с первого месяца." },
+				{ label: "Допродажа к каждому блюду", detail: "К пасте — вино, к стейку — соус, к латте — десерт. AI предлагает автоматом, без работы официанта." },
+				{ label: "Топ-20 вопросов гостей", detail: "Видите что спрашивают, что не заказывают после описания, какие добавки работают. Корректируете меню по фактам." }
 			],
-			breakdown: [
-				["Инфраструктура и AI-токены", "5 000"],
-				["Мультиязычие · 12+ языков", "2 000"],
-				["Голосовой режим (Тим говорит)", "1 500"],
-				["Поддержка и обновления", "1 400"]
-			],
-			featured: true
+			extras: [
+				{ label: "AI-фотосессия меню", price: "2 900 + 100 ₽/блюдо", detail: "Нет фото блюд — генерируем фотореалистичные через AI. 100+ блюд за 2 дня." },
+				{ label: "Парсинг меню", price: "бесплатно", detail: "Забираю с сайта или PDF, заливаю сам." }
+			]
 		},
 		{
 			n: "III",
+			name: "Ресторан",
+			price: "9 900",
+			featured: true,
+			features: [
+				{ label: "Всё из «Кафе»", detail: "QR-меню, AI, квиз, допродажа, аналитика." },
+				{ label: "Киоск: очередь −50%", detail: "Планшет ресторана: гости заказывают сами, кассир принимает оплату. Очередь короче вдвое, средний чек выше — гость не торопится." },
+				{ label: "10 темплейтов брендинга", detail: "Минималист, ретро, скандинавский, тропический — выбираете готовый или загружаете свой логотип и палитру. Без дизайнера." },
+				{ label: "Голос на 12 языках", detail: "Гость говорит «по-немецки расскажи про десерты» — AI понимает речь и отвечает голосом на немецком." },
+				{ label: "Ответ за 12 часов", detail: "Не суток. Лично от меня. Тариф для тех, кому простой стоит дорого." }
+			],
+			extras: [
+				{ label: "AI-фотосессия меню", price: "2 900 + 100 ₽/блюдо", detail: "Фотореалистичные фото блюд через AI." },
+				{ label: "Свой темплейт", price: "4 900 разово", detail: "Если 10 готовых не подходят — рисуем под вашу концепцию." },
+				{ label: "Парсинг меню", price: "бесплатно", detail: "Забираю с сайта/PDF и заливаю сам." }
+			]
+		},
+		{
+			n: "IV",
 			name: "Сеть",
-			price: "—",
-			sub: "поговорим",
-			bullets: [
-				"От 3 точек",
-				"API и интеграции",
-				"Белая метка под ваш бренд",
-				"SLA и отчётность"
+			price: "14 900",
+			features: [
+				{ label: "Всё из «Ресторана»", detail: "QR, AI, киоск, бренд, голос, приоритет." },
+				{ label: "Заказ → iiko / Poster", detail: "Заказ с киоска улетает прямо в вашу POS — кассир видит готовый чек. Не вводит руками." },
+				{ label: "Оплата СБП на киоске", detail: "Гость платит сам с экрана через QR. Полное самообслуживание." },
+				{ label: "Темплейт под бренд", detail: "Полностью под вашу айдентику, не из 10 готовых." },
+				{ label: "Менеджер + SLA", detail: "Один человек на связи, созвоны раз в месяц с отчётом по гостям и чеку. SLA на ответ." }
+			],
+			extras: [
+				{ label: "AI-фотосессия меню", price: "2 900 + 100 ₽/блюдо", detail: "Фотореалистичные фото блюд через AI." },
+				{ label: "Парсинг меню", price: "бесплатно", detail: "Забираю с сайта/PDF и заливаю сам." }
 			]
 		}
 	];
+
+	// Раскрытая фича / экстра — храним один ключ, чтобы при выборе нового — старый закрывался
+	let openFeature = $state(null);
+	function toggleFeature(tariffName, label) {
+		const key = `${tariffName}::${label}`;
+		openFeature = openFeature === key ? null : key;
+	}
+
+	// Раскрытие блока «Доп. услуги» — отдельный state per-tariff.
+	// Сворачивание по умолчанию даёт одинаковую высоту 4-х карточек (вид таблицы).
+	/** @type {Record<string, boolean>} */
+	let extrasOpen = $state({});
+	/** @param {string} tariffName */
+	function toggleExtras(tariffName) {
+		extrasOpen[tariffName] = !extrasOpen[tariffName];
+	}
+
+	// Выбранный тариф — пробрасывается в LeadForm. Кнопка «Выбрать N» на карточке
+	// устанавливает значение и скроллит к самой форме (не к верху секции),
+	// чтобы вся форма с плашкой «ВЫБРАН → ...» была видна целиком.
+	let selectedTariff = $state(null);
+	/** @param {string} name */
+	function pickTariff(name) {
+		selectedTariff = name;
+		scrollToForm();
+	}
+	/** Скролл к форме с приземлением в верхней трети viewport. */
+	function scrollToForm() {
+		const target = document.getElementById("lead-form");
+		if (!target) return;
+		const rect = target.getBoundingClientRect();
+		const offset = window.scrollY + rect.top - Math.max(48, window.innerHeight * 0.12);
+		window.scrollTo({ top: offset, behavior: "smooth" });
+	}
 </script>
 
 <!-- Hero — single focus, full-bleed photo, cinema. Nav лежит ПОВЕРХ hero,
@@ -444,10 +458,10 @@
 		</nav>
 
 		<!-- Тихая CTA — только обводка -->
-		<a href="#contact" class="justify-self-end group inline-flex items-center gap-3 border-[1.5px] border-base-content text-base-content px-5 py-2.5 hover:bg-base-content hover:text-base-100 transition-all duration-300">
+		<button type="button" onclick={scrollToForm} class="justify-self-end group inline-flex items-center gap-3 border-[1.5px] border-base-content text-base-content px-5 py-2.5 hover:bg-base-content hover:text-base-100 transition-all duration-300 cursor-pointer">
 			<span class="font-body font-medium text-base whitespace-nowrap">Записаться</span>
 			<span class="font-mono tabular text-accent transition-transform duration-300 group-hover:translate-x-1.5 shrink-0">→</span>
-		</a>
+		</button>
 	</header>
 	<!-- Oversized folio numeral -->
 	<div class="chapter-folio chapter-folio-primary" style="top: 4vh; right: -6vw;">I</div>
@@ -461,29 +475,30 @@
 	<!-- Bottom headline -->
 	<div class="relative max-w-5xl">
 		<h1
-			class="font-display font-medium text-base-content leading-[0.92]"
-			style="font-size: clamp(52px, 11vw, 144px); letter-spacing: -0.035em;"
+			class="font-display font-medium text-base-content leading-[0.95]"
+			style="font-size: clamp(44px, 8vw, 96px); letter-spacing: -0.03em;"
 			use:reveal={{ delay: 80 }}
 		>
-			<span class="italic">AI-официант,</span><br />
-			<span>который</span><br />
-			<span class="text-primary">знает ваше меню.</span>
+			<span class="italic">Меню,</span><br />
+			<span>которое продаёт</span><br />
+			<span class="text-primary">за вас.</span>
 		</h1>
 
-		<div class="mt-10 md:mt-12 grid md:grid-cols-[1fr_auto] gap-6 md:gap-10 items-end">
+		<div class="mt-8 md:mt-10 grid md:grid-cols-[1fr_auto] gap-6 md:gap-10 items-end">
 			<p
 				class="font-body text-base md:text-lg text-base-content/80 max-w-xl leading-relaxed"
 				use:reveal={{ delay: 220 }}
 			>
-				QR-меню на 12 языках с собеседником-AI на борту. Турист читает на родном, выбирает по подсказке, зовёт официанта одним касанием — уведомление прилетает в ваш мессенджер. AI учится на вашем меню — и со временем становится частью бренда.
+				QR на столе или планшет у кассы. Гость заказывает сам на 12&nbsp;языках, средний чек растёт. Без увеличения штата.
 			</p>
 			<div class="hero-cta-block flex flex-wrap gap-3">
-				<a
-					href="#contact"
-					class="btn-glow bg-primary text-primary-content font-body font-semibold text-sm py-4 px-6 hover:bg-base-content transition-colors"
+				<button
+					type="button"
+					onclick={scrollToForm}
+					class="btn-glow bg-primary text-primary-content font-body font-semibold text-sm py-4 px-6 hover:bg-base-content transition-colors cursor-pointer"
 				>
-					Записаться на пилот
-				</a>
+					Попробовать 14 дней
+				</button>
 				<a
 					href="#method"
 					class="border-[1.5px] border-base-content text-base-content font-body font-medium text-sm py-4 px-6 hover:bg-base-content/10 transition-colors link-underline"
@@ -495,9 +510,9 @@
 	</div>
 
 	<!-- Scroll cue -->
-	<div class="relative mt-16 flex items-center gap-2 masthead opacity-60" use:reveal={{ delay: 600 }}>
-		<div class="w-10 h-px bg-current"></div>
-		<span>скроллите вниз</span>
+	<div class="relative mt-16 flex items-center gap-3 opacity-80" use:reveal={{ delay: 600 }}>
+		<div class="w-12 h-px bg-current"></div>
+		<span class="font-display italic text-lg md:text-xl">скроллите вниз</span>
 	</div>
 </section>
 
@@ -515,11 +530,11 @@
 		</div>
 
 		<!-- Scroll hint — виден до старта pin-таймлайна, чтобы юзер не подумал что страница не загрузилась -->
-		<div class="scroll-hint hidden md:flex items-center gap-3 mt-6 masthead opacity-80">
-			<span class="inline-block w-2 h-2 bg-accent rounded-full pulse-dot"></span>
-			<span>скроллите вниз — цифры раскроются по очереди</span>
+		<div class="scroll-hint hidden md:flex items-center gap-4 mt-6 opacity-90">
+			<span class="inline-block w-2.5 h-2.5 bg-accent rounded-full pulse-dot"></span>
+			<span class="font-display italic text-lg md:text-xl">скроллите вниз — цифры раскроются по очереди</span>
 			<div class="flex-1 h-px bg-current/20"></div>
-			<span class="font-display italic text-base opacity-70">↓</span>
+			<span class="font-display italic text-2xl md:text-3xl opacity-80">↓</span>
 		</div>
 
 		<div class="mt-10 md:mt-16 grid grid-cols-1 md:grid-cols-3 gap-0 border-t border-current/20">
@@ -530,17 +545,17 @@
 					<span use:counter={{ target: 12, duration: 1600, manual: true }}>0</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
-					языков читает турист и говорит голосом — авто-детект
+					языков — турист читает и говорит голосом, авто-детект
 				</div>
 			</div>
 			<!-- Stat 02 -->
 			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-r border-current/20">
-				<div class="eyebrow">02 · точность</div>
-				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
-					<span use:counter={{ target: 97, duration: 1600, manual: true }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top">%</span>
+				<div class="eyebrow">02 · средний чек</div>
+				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none text-accent">
+					+<span use:counter={{ target: 18, duration: 1600, manual: true }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top text-current">%</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
-					верификатор ловит несоответствия между ответом и меню
+					рост чека от квиза и допродажи — измеримо с первого месяца
 				</div>
 			</div>
 			<!-- Stat 03 -->
@@ -550,43 +565,43 @@
 					&lt;<span use:counter={{ target: 1.4, duration: 1600, decimals: 1, manual: true }}>0.0</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
-					секунд — средний ответ AI на вопрос гостя
+					секунды — средний ответ AI на вопрос гостя
 				</div>
 			</div>
 			<!-- Stat 04 -->
 			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-b-0 md:border-r border-current/20">
-				<div class="eyebrow">04 · себестоимость</div>
+				<div class="eyebrow">04 · точность</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
-					~<span use:counter={{ target: 3, duration: 1600, manual: true }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top">₽</span>
+					<span use:counter={{ target: 97, duration: 1600, manual: true }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top">%</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
-					стоит один полный диалог гостя с AI-официантом
+					верификатор сверяет каждый ответ с вашей картой блюд
 				</div>
 			</div>
 			<!-- Stat 05 -->
 			<div class="numbers-stat relative p-6 md:p-10 border-b md:border-b-0 md:border-r border-current/20">
-				<div class="eyebrow">05 · пилоты</div>
+				<div class="eyebrow">05 · окупаемость</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none text-accent">
-					{pilotsFree}<span class="text-3xl md:text-5xl align-top text-current">/{PILOTS_TOTAL}</span>
+					&lt;<span use:counter={{ target: 1, duration: 1600, manual: true }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top text-current">недели</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
-					свободных бесплатных мест — занимайте, пока есть
+					подписка окупается ростом среднего чека за дни, не месяцы
 				</div>
 			</div>
 			<!-- Stat 06 -->
 			<div class="numbers-stat relative p-6 md:p-10">
-				<div class="eyebrow">06 · кейсы</div>
+				<div class="eyebrow">06 · trial</div>
 				<div class="font-display italic text-6xl md:text-8xl font-medium mt-6 leading-none">
-					0<span class="text-3xl md:text-5xl align-top font-body not-italic font-normal opacity-60 ml-2">пока</span>
+					<span use:counter={{ target: 14, duration: 1600, manual: true }}>0</span>&nbsp;<span class="text-3xl md:text-5xl align-top">дней</span>
 				</div>
 				<div class="font-body text-sm md:text-base mt-4 opacity-80 leading-snug">
-					клиентских кейсов — первых ищу сейчас
+					бесплатно, без карты — попробуйте на одной точке
 				</div>
 			</div>
 		</div>
 
 		<p class="numbers-footer font-display italic text-lg md:text-xl mt-12 md:mt-16 max-w-3xl opacity-75 leading-relaxed">
-			Первые три ресторана — лично, руками. Без пресейла, без агентств, без красивых слов.
+			Цифры — не маркетинг. Это технические границы продукта на сегодня и тарифная сетка после пилота.
 		</p>
 	</div>
 </section>
@@ -612,17 +627,9 @@
 		<span>Поток гостя</span>
 	</div>
 
-	<!-- Scroll hint — виден до старта pin-таймлайна -->
-	<div class="scroll-hint hidden md:flex items-center gap-3 mt-6 masthead opacity-80">
-		<span class="inline-block w-2 h-2 bg-accent rounded-full pulse-dot"></span>
-		<span>скроллите вниз — четыре хода развернутся один за другим</span>
-		<div class="flex-1 h-px bg-base-content/20"></div>
-		<span class="font-display italic text-base text-base-content/70">↓</span>
-	</div>
-
-	<div class="relative grid grid-cols-1 md:grid-cols-2 gap-y-10 md:gap-y-20 gap-x-10 mt-12 md:mt-20">
+	<div class="relative grid grid-cols-1 md:grid-cols-2 gap-y-12 md:gap-y-16 gap-x-10 mt-10 md:mt-14">
 		{#each method as [n, title, desc], i (n)}
-			<div class="method-step relative {i % 2 === 1 ? 'md:mt-24' : ''} {i > 0 ? 'md:pl-8' : ''}">
+			<div class="method-step relative {i % 2 === 1 ? 'md:mt-16' : ''} {i > 0 ? 'md:pl-8' : ''}">
 				<div class="flex items-start gap-4 md:gap-6">
 					<div class="method-num font-display italic font-medium text-accent leading-none shrink-0" style="font-size: clamp(64px, 10vw, 132px); letter-spacing: -0.04em;">
 						{n}
@@ -697,15 +704,15 @@
 							<!-- Descriptive copy per step -->
 							<div class="font-body text-[15px] md:text-base text-base-content/85 leading-relaxed">
 								{#if i === 0}
-									Гость подходит к столу и видит QR. Сканирует камерой — открывается веб-приложение. Устанавливать ничего не нужно, аккаунтов нет.
+									Два форм-фактора: гость сканирует QR со стола на телефоне — или подходит к планшету у кассы. Без приложений и аккаунтов.
 								{:else if i === 1}
-									PWA — HTML и JavaScript на GitHub Pages. Загружается за меньше двух секунд даже на медленном 4G. Работает в любом браузере телефона.
+									PWA на SvelteKit. Загружается меньше чем за 2 секунды на 4G. Работает в любом браузере и в фуллскрин-режиме на планшете ресторана.
 								{:else if i === 2}
-									Клод Хайку 4.5 через OpenRouter. Дешёвый, быстрый, говорит на 12 языках. Промпт собирается из меню-JSON и истории разговора.
+									Claude Haiku 4.5 через OpenRouter. Быстрый, говорит на 12 языках. Промпт собирается из вашего меню и истории разговора с гостем.
 								{:else if i === 3}
-									Отдельная модель проверяет каждый ответ официанта. Сверяет состав, аллергены и цены с картой шефа. Если не сходится — помечает ответ.
+									Отдельная модель проверяет каждый ответ AI. Сверяет состав, аллергены и цены с картой шефа. Несоответствие — помечает и не отдаёт гостю.
 								{:else}
-									Telegram-бот получает сообщение: номер стола, выбранные блюда, сумма, время. Официант видит и идёт к гостю.
+									Дашборд /staff на любом устройстве — без установки приложения. Уведомление приходит мгновенно: номер стола, заказ, сумма, контекст разговора.
 								{/if}
 							</div>
 
@@ -728,12 +735,12 @@
 								Работает<br />из коробки.
 							</h3>
 							<p class="font-body text-sm opacity-85 mt-4 leading-relaxed">
-								Пять компонентов, один поток, ноль серверов которые вы администрируете. Я настраиваю всё за день — дальше продукт живёт сам.
+								Пять компонентов, один поток, ноль серверов которые вы администрируете. Запуск за день, дальше продукт живёт сам.
 							</p>
 						</div>
-						<a href="#contact" class="btn-glow bg-accent text-accent-content font-body font-semibold text-sm py-4 px-5 mt-6 self-start">
-							Записаться на пилот
-						</a>
+						<button type="button" onclick={scrollToForm} class="btn-glow bg-accent text-accent-content font-body font-semibold text-sm py-4 px-5 mt-6 self-start cursor-pointer">
+							Попробовать 14 дней
+						</button>
 					</div>
 				</div>
 			</div>
@@ -748,59 +755,56 @@
 	</div>
 </section>
 
-<!-- Pull quote — full-screen cinema moment. PIN на десктопе. -->
-<section class="pull-quote-pin section-rhythm relative px-6 py-20 md:py-32 overflow-hidden flex flex-col justify-center min-h-screen-safe">
+<!-- Pull quote — full-screen cinema moment. PIN на десктопе.
+     Layout: justify-between → quote сверху, 3 facts снизу, естественный воздух между. -->
+<section class="pull-quote-pin section-rhythm relative px-6 py-20 md:py-24 overflow-hidden flex flex-col justify-between min-h-screen-safe">
 	<div class="chapter-folio chapter-folio-primary" style="top: -12vh; right: -8vw;">VI</div>
 
+	<!-- Top: eyebrow + quote + tagline -->
 	<div class="relative max-w-7xl mx-auto w-full">
 		<div class="pq-masthead masthead mb-6 md:mb-8">
 			Главное обещание
 		</div>
 
-		<!-- Scroll hint — виден до старта pin-таймлайна -->
-		<div class="scroll-hint hidden md:flex items-center gap-3 mb-6 masthead opacity-80">
-			<span class="inline-block w-2 h-2 bg-accent rounded-full pulse-dot"></span>
-			<span>скроллите вниз — обещание раскрывается</span>
-			<div class="flex-1 h-px bg-base-content/20"></div>
-			<span class="font-display italic text-base text-base-content/70">↓</span>
-		</div>
-
-		<blockquote class="pq-quote font-display italic font-medium text-base-content leading-[0.95] max-w-6xl" style="font-size: clamp(44px, 8.5vw, 120px); letter-spacing: -0.03em;">
-			<span class="text-accent">«</span>Всё, что скажет AI,<br />
-			уже&nbsp;<span class="text-primary">в&nbsp;вашем меню.</span><span class="text-accent">»</span>
+		<blockquote class="pq-quote font-display italic font-medium text-base-content leading-[0.95] max-w-6xl" style="font-size: clamp(40px, 7vw, 100px); letter-spacing: -0.03em;">
+			<span class="text-accent">«</span>Один <span class="text-primary">экран.</span><br />
+			Двенадцать <span class="text-primary">языков.</span><br />
+			Ноль <span class="text-primary">ошибок.</span><span class="text-accent">»</span>
 		</blockquote>
 
-		<div class="pq-tagline mt-10 md:mt-14 font-display italic text-base md:text-xl max-w-2xl leading-relaxed">
-			Ни одного выдуманного блюда. Ни одного несуществующего ингредиента. Ни одного ответа без сверки с картой шефа.
+		<div class="pq-tagline mt-8 md:mt-10 font-display italic text-base md:text-xl max-w-2xl leading-relaxed" data-accent-words="2,5,9">
+			Гость заказывает сам на любом языке. Кассир не учит немецкий. Чек растёт без работы официанта.
 		</div>
+	</div>
 
-		<!-- 3 факт-подпорки: раскрывают обещание конкретикой -->
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-14 md:mt-20 border-y border-base-content/25">
-			<div class="pq-fact p-6 md:p-8 border-b md:border-b-0 md:border-r border-base-content/25">
-				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">01 · источник</div>
+	<!-- Bottom: 3 факт-подпорки. Прижаты к низу через justify-between. -->
+	<div class="relative max-w-7xl mx-auto w-full mt-12 md:mt-16">
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-0 border-y border-base-content/25">
+			<div class="pq-fact p-6 md:p-7 border-b md:border-b-0 md:border-r border-base-content/25">
+				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">01 · экран</div>
 				<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-tight">
-					Из меню шефа
+					Один интерфейс
 				</div>
 				<div class="font-body text-sm text-base-content/70 mt-3 leading-snug">
-					AI читает только ваш JSON-каталог. Если блюда нет в карте — его нет и в ответе.
+					QR на телефоне или планшет у кассы — гость видит одно меню, ваш бренд, тот же AI.
 				</div>
 			</div>
-			<div class="pq-fact p-6 md:p-8 border-b md:border-b-0 md:border-r border-base-content/25">
-				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">02 · сверка</div>
+			<div class="pq-fact p-6 md:p-7 border-b md:border-b-0 md:border-r border-base-content/25">
+				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">02 · языки</div>
+				<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-tight">
+					12 авто-детект
+				</div>
+				<div class="font-body text-sm text-base-content/70 mt-3 leading-snug">
+					Гость пишет или говорит на родном — AI понимает и отвечает голосом. Без переводчика.
+				</div>
+			</div>
+			<div class="pq-fact p-6 md:p-7">
+				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">03 · ошибки</div>
 				<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-tight">
 					97&nbsp;% точность
 				</div>
 				<div class="font-body text-sm text-base-content/70 mt-3 leading-snug">
-					Отдельная модель-верификатор проверяет состав, аллергены и цены перед каждой отправкой гостю.
-				</div>
-			</div>
-			<div class="pq-fact p-6 md:p-8">
-				<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">03 · скорость</div>
-				<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-tight">
-					1,4&nbsp;секунды
-				</div>
-				<div class="font-body text-sm text-base-content/70 mt-3 leading-snug">
-					Средний ответ — быстрее, чем гость дочитает описание блюда в меню.
+					Отдельный верификатор сверяет состав, аллергены и цены с вашей картой перед каждым ответом.
 				</div>
 			</div>
 		</div>
@@ -908,74 +912,124 @@
 		<h2 class="font-display italic font-medium text-base-content leading-[0.9]" style="font-size: clamp(56px, 12vw, 160px); letter-spacing: -0.03em;" use:reveal={{ delay: 120 }}>
 			Честный счёт.
 		</h2>
-		<div class="masthead mt-6" use:reveal={{ delay: 280 }}>пилот ноль — кафе девять девятьсот — сеть по разговору</div>
+		<div class="masthead mt-6" use:reveal={{ delay: 280 }}>лавка тысяча девятьсот · кафе пять девятьсот · ресторан и сеть</div>
 	</div>
 </section>
 
 <!-- Tariffs -->
-<section id="tarif" class="tarif-pin section-rhythm relative px-6 py-20 md:py-24 overflow-hidden min-h-screen-safe">
+<section id="tarif" class="tarif-pin section-rhythm relative px-6 py-20 md:py-24 overflow-hidden">
 	<div class="chapter-folio chapter-folio-primary" style="top: -10vh; left: -5vw;">$</div>
 
-	<div class="relative max-w-5xl mx-auto w-full">
+	<div class="relative max-w-7xl mx-auto w-full">
 		<div class="tarif-header flex items-center justify-between pb-3 border-b border-base-content masthead">
 			<div class="flex items-baseline gap-3">
 				<span class="eyebrow">Глава VI</span>
-				<span class="font-display italic text-xl md:text-2xl font-medium text-base-content">Три пакета</span>
+				<span class="font-display italic text-xl md:text-2xl font-medium text-base-content">Четыре пакета</span>
 			</div>
-			<span>₽ / месяц</span>
+			<span>₽ / месяц · 14 дней бесплатно</span>
 		</div>
 
-		<!-- Scroll hint — виден до старта pin-таймлайна -->
-		<div class="scroll-hint hidden md:flex items-center gap-3 mt-6 masthead opacity-80">
-			<span class="inline-block w-2 h-2 bg-accent rounded-full pulse-dot"></span>
-			<span>скроллите вниз — три тарифа развернутся с разбивкой по цене</span>
-			<div class="flex-1 h-px bg-base-content/20"></div>
-			<span class="font-display italic text-base text-base-content/70">↓</span>
-		</div>
-
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-0 mt-10 md:mt-14 border border-base-content/25">
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 mt-10 md:mt-14 border border-base-content/25 lg:items-stretch">
 			{#each tariffs as p (p.n)}
-				<div class="tarif-card relative p-7 md:p-8 border-b md:border-b-0 md:border-r border-base-content/20 last:border-b-0 md:last:border-r-0 transition-all duration-500 hover:bg-base-100 group overflow-hidden">
-					<!-- Верхняя линия-акцент появляется плавно при hover — равноправно для всех -->
-					<div class="absolute top-0 left-0 right-0 h-[3px] bg-accent transition-transform duration-500 scale-x-0 group-hover:scale-x-100" style="transform-origin: left center;"></div>
+				<div class="tarif-card relative flex flex-col border-b lg:border-b-0 lg:border-r border-base-content/20 last:border-b-0 lg:last:border-r-0 sm:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r sm:[&:nth-child(-n+2)]:border-b lg:[&:nth-child(-n+2)]:border-b-0 transition-colors duration-500 hover:bg-base-100/60 group overflow-hidden {p.featured ? 'lg:bg-base-100 lg:z-10 lg:shadow-[inset_0_0_0_2px_var(--color-base-content)]' : ''}">
+					<!-- Верхняя линия-акцент: для featured — постоянная, для остальных — при hover -->
+					<div class="absolute top-0 left-0 right-0 h-[3px] bg-accent transition-transform duration-500 {p.featured ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}" style="transform-origin: left center;"></div>
 
-					<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">№ {p.n}</div>
-					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content mt-2 transition-transform duration-500 group-hover:translate-x-1">{p.name}</div>
-					<div class="font-display italic text-sm text-base-content/70 mt-2 leading-snug min-h-[2.6em]">{p.sub}</div>
+					<!-- Header: номер + featured-метка + имя + цена в одной строке -->
+					<div class="p-6 md:p-7 pb-6">
+						<div class="flex items-center justify-between min-h-[14px]">
+							<div class="font-mono tabular text-[11px] text-accent tracking-[0.2em]">№ {p.n}</div>
+							{#if p.featured}
+								<div class="font-mono tabular text-[10px] text-accent tracking-[0.18em] uppercase">рекомендуем</div>
+							{/if}
+						</div>
+						<div class="font-display italic text-2xl md:text-3xl font-medium text-base-content mt-3 leading-none">{p.name}</div>
 
-					<div class="tarif-price flex items-baseline gap-1.5 mt-6">
-						<div class="font-mono tabular text-[44px] md:text-[52px] font-medium text-base-content leading-none">{p.price}</div>
-						{#if p.price !== "—" && p.price !== "0"}
-							<div class="font-body text-[13px] text-base-content/60">₽ / мес</div>
-						{/if}
+						<!-- Цена доминирует: цифра крупно, юниты столбиком справа -->
+						<div class="tarif-price flex items-start gap-2 mt-5 whitespace-nowrap">
+							<div class="font-mono tabular text-[44px] md:text-[56px] xl:text-[60px] font-medium text-base-content leading-[0.85]">{p.price}</div>
+							<div class="flex flex-col font-mono tabular text-[10px] text-base-content/55 tracking-[0.16em] uppercase pt-1">
+								<span>₽</span>
+								<span>/&nbsp;мес</span>
+							</div>
+						</div>
 					</div>
 
-					<div class="border-t border-dotted border-base-content/30 my-5 md:my-6"></div>
-
-					{#each p.bullets as b (b)}
-						<div class="tarif-bullet flex gap-2.5 py-1.5 text-sm md:text-[15px] text-base-content/85 leading-snug">
-							<span class="font-mono text-accent text-[11px] pt-1 shrink-0">·</span>
-							<span>{b}</span>
-						</div>
-					{/each}
-
-					{#if p.breakdown}
-						<div class="tarif-breakdown mt-6 pt-5 border-t border-dotted border-base-content/30">
-							<div class="font-mono tabular text-[10px] text-base-content/50 tracking-[0.18em] mb-3">
-								ИЗ ЧЕГО СКЛАДЫВАЕТСЯ
-							</div>
-							{#each p.breakdown as [label, amount] (label)}
-								<div class="flex items-baseline justify-between gap-3 py-1 text-[13px] text-base-content/75 leading-snug">
-									<span>{label}</span>
-									<span class="font-mono tabular text-base-content/90 whitespace-nowrap">{amount} ₽</span>
+					<!-- Features as expandable buttons -->
+					<div class="flex-1 border-t border-dotted border-base-content/30">
+						{#each p.features as f (f.label)}
+							{@const key = `${p.name}::${f.label}`}
+							{@const isOpen = openFeature === key}
+							<button
+								type="button"
+								onclick={() => toggleFeature(p.name, f.label)}
+								class="w-full text-left px-6 md:px-7 py-3 flex items-start gap-3 hover:bg-base-content/[0.04] transition-colors border-b border-dotted border-base-content/20 last:border-b-0 group/row {isOpen ? 'bg-base-content/[0.03]' : ''}"
+							>
+								<span class="font-mono text-accent text-[11px] pt-1.5 shrink-0">·</span>
+								<span class="flex-1 min-w-0 text-sm md:text-[14px] text-base-content/90 leading-snug truncate" title={f.label}>{f.label}</span>
+								<span class="font-mono text-[14px] text-base-content/35 group-hover/row:text-accent transition-all duration-300 shrink-0 leading-none {isOpen ? 'rotate-45 text-accent' : ''}">+</span>
+							</button>
+							{#if isOpen}
+								<div class="px-6 md:px-7 py-4 bg-base-content/[0.04] border-b border-dotted border-base-content/20 font-display italic text-[13px] text-base-content/80 leading-relaxed">
+									{f.detail}
 								</div>
-							{/each}
-							<div class="flex items-baseline justify-between gap-3 pt-2 mt-2 border-t border-base-content/20 text-[13px] font-medium">
-								<span class="text-base-content">Итого</span>
-								<span class="font-mono tabular text-base-content whitespace-nowrap">9 900 ₽</span>
-							</div>
+							{/if}
+						{/each}
+					</div>
+
+					<!-- Доп. услуги — свёрнуты по умолчанию (одинаковая высота 4-х карточек = вид
+					     таблицы). Раскрытие по клику показывает список с ценами. -->
+					{#if p.extras && p.extras.length > 0}
+						{@const xOpen = !!extrasOpen[p.name]}
+						<div class="border-t border-base-content/20">
+							<button
+								type="button"
+								onclick={() => toggleExtras(p.name)}
+								class="w-full px-6 md:px-7 py-3 flex items-center justify-between gap-3 font-mono tabular text-[10px] text-base-content/60 hover:text-accent tracking-[0.18em] uppercase transition-colors cursor-pointer"
+								aria-expanded={xOpen}
+							>
+								<span class="flex items-center gap-2">
+									<span class="text-accent">+</span>
+									доп. услуги ({p.extras.length})
+								</span>
+								<span class="font-display italic text-base not-italic transition-transform duration-300 leading-none {xOpen ? 'rotate-45 text-accent' : ''}">+</span>
+							</button>
+							{#if xOpen}
+								<div class="border-t border-dotted border-base-content/20">
+									{#each p.extras as e (e.label)}
+										{@const key = `${p.name}::extra::${e.label}`}
+										{@const isOpen = openFeature === key}
+										<button
+											type="button"
+											onclick={() => toggleFeature(p.name, `extra::${e.label}`)}
+											class="w-full text-left px-6 md:px-7 py-2.5 flex items-baseline justify-between gap-3 hover:bg-base-content/[0.04] transition-colors border-b border-dotted border-base-content/20 last:border-b-0 group/row {isOpen ? 'bg-base-content/[0.03]' : ''}"
+										>
+											<span class="text-[13px] text-base-content/80 leading-snug">{e.label}</span>
+											<span class="font-mono tabular text-[12px] text-accent whitespace-nowrap shrink-0">{e.price}</span>
+										</button>
+										{#if isOpen}
+											<div class="px-6 md:px-7 py-3 bg-base-content/[0.04] border-b border-dotted border-base-content/20 last:border-b-0 font-display italic text-[13px] text-base-content/80 leading-relaxed">
+												{e.detail}
+											</div>
+										{/if}
+									{/each}
+								</div>
+							{/if}
 						</div>
 					{/if}
+
+					<!-- CTA — всегда снизу. При клике подставляет тариф в форму
+					     заявки и скроллит к #contact (умный hand-off). -->
+					<button
+						type="button"
+						onclick={() => pickTariff(p.name)}
+						class="mt-auto block w-full px-6 md:px-7 py-5 border-t border-base-content/30 font-body font-semibold text-sm text-center transition-colors cursor-pointer {p.featured ? 'bg-base-content text-base-100 hover:bg-primary' : 'text-base-content hover:bg-base-content hover:text-base-100'}"
+					>
+						<span class="inline-flex items-center gap-2">
+							Выбрать «{p.name}»
+							<span class="font-mono text-accent transition-transform duration-300 group-hover:translate-x-1">→</span>
+						</span>
+					</button>
 				</div>
 			{/each}
 		</div>
@@ -1005,12 +1059,12 @@
 			<!-- LEFT — заголовок, описание, пилот-индикатор -->
 			<div>
 				<h2 class="font-display italic font-medium text-base-content leading-[1.0]" style="font-size: clamp(48px, 7vw, 96px); letter-spacing: -0.03em;">
-					Пилот<br />
-					<span class="text-primary">начинается</span><br />
-					с&nbsp;письма.
+					Запуск<br />
+					<span class="text-primary">за один</span><br />
+					день.
 				</h2>
 				<p class="font-body text-base md:text-lg text-base-content/80 mt-8 max-w-lg leading-relaxed">
-					Первые три пилотных места — бесплатно. Я собираю каталог меню сам, настраиваю QR-коды, передаю ключ от кухни в Telegram.
+					Первые три ресторана — пилот: собираю меню сам, настраиваю QR-коды и киоск, подключаю ваш дашборд /staff. Бесплатно, лично, до результата.
 				</p>
 
 				<!-- Индикатор свободных пилотных мест -->
@@ -1040,19 +1094,19 @@
 					</div>
 					{#if pilotsFree > 0}
 						<div class="px-5 py-3 border-t border-base-content/25 font-display italic text-sm text-base-content/70 leading-snug">
-							Когда все три займутся — тариф «Кафе» от 9 900 ₽/мес, без пилотной скидки.
+							Когда все три займутся — обычные тарифы от 1 990 ₽/мес, 14 дней бесплатно.
 						</div>
 					{:else}
 						<div class="px-5 py-3 border-t border-base-content/25 font-display italic text-sm text-error leading-snug">
-							Все пилотные места заняты. Пишите — поставлю в очередь на платный запуск по тарифу «Кафе».
+							Пилотные места заняты. Пишите — запуск по обычному тарифу с 14-дневным trial.
 						</div>
 					{/if}
 				</div>
 			</div>
 
 			<!-- RIGHT — форма заявки на пилот -->
-			<div>
-				<LeadForm />
+			<div id="lead-form" class="scroll-mt-32">
+				<LeadForm bind:selectedTariff />
 			</div>
 		</div>
 
@@ -1066,10 +1120,10 @@
 			<div class="md:grid md:grid-cols-[1fr_auto] md:gap-10 md:items-end">
 				<div>
 					<p class="font-display italic text-lg md:text-xl text-base-content leading-[1.55] drop-cap">
-						Я&nbsp;делаю этот продукт один. Сам пишу код, сам собираю каталог, сам отвечаю на вопросы. Поэтому первые три ресторана — бесплатно.
+						Я&nbsp;делаю этот продукт один. Сам пишу код, сам собираю каталог, сам отвечаю на&nbsp;вопросы. Поэтому первым трём ресторанам — пилот: настраиваю руками, выезжаю, без денег.
 					</p>
 					<p class="font-display italic text-base md:text-lg text-base-content/80 leading-[1.55] mt-5">
-						Не пресейл, не воронка, не агентство. Работа руками с конкретным шефом и&nbsp;конкретным меню. Я отвечаю на письма в&nbsp;течение суток. Если ваше заведение в&nbsp;Калининграде — могу приехать и&nbsp;показать всё вживую.
+						Не&nbsp;пресейл, не&nbsp;воронка, не&nbsp;агентство. Работа с&nbsp;конкретным шефом и&nbsp;его меню. Отвечаю на письма за&nbsp;сутки. Если ваше заведение в&nbsp;Калининграде — приеду и&nbsp;покажу вживую.
 					</p>
 
 					<!-- Signature -->
@@ -1098,26 +1152,26 @@
 		<div class="mt-12 md:mt-16">
 			<div class="masthead mb-3">или напрямую</div>
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-0 border-y border-base-content">
-			<a href="https://t.me/tablemind_orders_bot" target="_blank" rel="noopener" class="group flex items-center gap-5 py-6 md:py-8 px-5 md:px-8 border-b sm:border-b-0 sm:border-r border-base-content/25 hover:bg-base-100 transition-colors">
+			<a href="mailto:hi@tablemind.ru" class="group flex items-center gap-5 py-6 md:py-8 px-5 md:px-8 border-b sm:border-b-0 sm:border-r border-base-content/25 hover:bg-base-100 transition-colors">
 				<span class="eyebrow tabular shrink-0">01</span>
-				<div class="flex-1 min-w-0">
-					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-none">
-						Telegram
-					</div>
-					<div class="font-body text-sm text-base-content/65 mt-2">
-						@tablemind_orders_bot · бот соберёт заявку и передаст мне
-					</div>
-				</div>
-				<span class="font-mono tabular text-xl text-accent shrink-0 group-hover:translate-x-2 transition-transform duration-300">→</span>
-			</a>
-			<a href="mailto:hi@tablemind.ru" class="group flex items-center gap-5 py-6 md:py-8 px-5 md:px-8 hover:bg-base-100 transition-colors">
-				<span class="eyebrow tabular shrink-0">02</span>
 				<div class="flex-1 min-w-0">
 					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-none">
 						Почта
 					</div>
 					<div class="font-body text-sm text-base-content/65 mt-2">
-						hi@tablemind.ru · до&nbsp;суток на&nbsp;ответ
+						hi@tablemind.ru · ответ за&nbsp;сутки
+					</div>
+				</div>
+				<span class="font-mono tabular text-xl text-accent shrink-0 group-hover:translate-x-2 transition-transform duration-300">→</span>
+			</a>
+			<a href="https://t.me/tablemind_orders_bot" target="_blank" rel="noopener" class="group flex items-center gap-5 py-6 md:py-8 px-5 md:px-8 hover:bg-base-100 transition-colors">
+				<span class="eyebrow tabular shrink-0">02</span>
+				<div class="flex-1 min-w-0">
+					<div class="font-display italic text-3xl md:text-4xl font-medium text-base-content leading-none">
+						Чат
+					</div>
+					<div class="font-body text-sm text-base-content/65 mt-2">
+						@tablemind_orders_bot · быстрая заявка
 					</div>
 				</div>
 				<span class="font-mono tabular text-xl text-accent shrink-0 group-hover:translate-x-2 transition-transform duration-300">→</span>
@@ -1146,11 +1200,11 @@
 				<span class="font-display italic text-2xl md:text-3xl font-semibold tracking-wide">TableMind</span>
 			</div>
 			<div class="flex flex-col sm:flex-row gap-6 md:gap-10 masthead opacity-90" style="color: inherit">
-				<a href="https://t.me/tablemind_orders_bot" target="_blank" rel="noopener" class="link-underline">
-					Telegram · @tablemind_orders_bot
-				</a>
 				<a href="mailto:hi@tablemind.ru" class="link-underline">
 					Почта · hi@tablemind.ru
+				</a>
+				<a href="https://t.me/tablemind_orders_bot" target="_blank" rel="noopener" class="link-underline">
+					Чат · @tablemind_orders_bot
 				</a>
 			</div>
 		</div>

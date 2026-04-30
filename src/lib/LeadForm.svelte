@@ -5,6 +5,11 @@
 	// Fallback на старый Vercel-URL — на случай если secret ещё не настроен.
 	const API_URL = import.meta.env.PUBLIC_API_URL || "https://table-mind-seven.vercel.app/api/notify";
 
+	// selectedTariff пробрасывается из родителя (CTA на тарифной карточке).
+	// bind:selectedTariff позволяет сбрасывать после успешной отправки.
+	/** @type {{ selectedTariff?: string | null }} */
+	let { selectedTariff = $bindable(null) } = $props();
+
 	/** @type {"idle" | "sending" | "ok" | "error"} */
 	let status = $state("idle");
 	let errorText = $state("");
@@ -34,6 +39,7 @@
 					contact: contact.trim(),
 					email: email.trim() || undefined,
 					menuInfo: menuInfo.trim() || undefined,
+					tariff: selectedTariff || undefined,
 					source: "tablemind-site"
 				})
 			});
@@ -46,9 +52,10 @@
 			contact = "";
 			email = "";
 			menuInfo = "";
+			selectedTariff = null;
 		} catch (e) {
 			status = "error";
-			errorText = e?.message || "Не получилось отправить — попробуйте ещё раз или напишите в Telegram";
+			errorText = e?.message || "Не получилось отправить — попробуйте ещё раз или напишите hi@tablemind.ru";
 		}
 	}
 
@@ -61,9 +68,27 @@
 <div class="border border-base-content bg-base-100">
 	<!-- Top bar -->
 	<div class="flex items-center justify-between px-5 py-3 border-b border-base-content/25 masthead">
-		<span>Заявка на пилот</span>
+		<span>{selectedTariff ? `Заявка · тариф «${selectedTariff}»` : "Заявка на пилот"}</span>
 		<span class="text-accent">бесплатно · 14 дней</span>
 	</div>
+
+	{#if selectedTariff && status !== "ok"}
+		<!-- Подтверждение выбранного тарифа — кликабельно для сброса -->
+		<div class="flex items-center justify-between gap-3 px-5 py-3 bg-base-content/[0.04] border-b border-base-content/15">
+			<div class="flex items-baseline gap-2">
+				<span class="font-mono tabular text-[10px] text-accent tracking-[0.18em]">ВЫБРАН →</span>
+				<span class="font-display italic text-base font-medium text-base-content">«{selectedTariff}»</span>
+			</div>
+			<button
+				type="button"
+				onclick={() => (selectedTariff = null)}
+				class="font-mono text-[10px] tracking-[0.16em] text-base-content/55 hover:text-accent transition-colors uppercase cursor-pointer"
+				aria-label="Сбросить выбранный тариф"
+			>
+				сбросить ✕
+			</button>
+		</div>
+	{/if}
 
 	{#if status === "ok"}
 		<!-- Success state -->
@@ -73,7 +98,7 @@
 				<span class="text-primary">отправлена.</span>
 			</div>
 			<p class="font-display italic text-base md:text-lg text-base-content/70 mt-5 max-w-md mx-auto leading-relaxed">
-				Я получил ваш запрос в Telegram. Вернусь с персональным демо за&nbsp;1–2 дня.
+				Получил вашу заявку. Вернусь с персональным демо за&nbsp;1–2 дня.
 			</p>
 			<button
 				class="mt-8 border-[1.5px] border-base-content text-base-content font-body font-medium text-sm py-3 px-6 hover:bg-base-content hover:text-base-100 transition-colors"
@@ -103,7 +128,7 @@
 			<!-- Contact -->
 			<label class="block">
 				<span class="font-mono text-[11px] text-accent tracking-[0.18em] uppercase">
-					02 · Telegram или телефон
+					02 · Контакт — телефон, Telegram, WhatsApp
 				</span>
 				<input
 					type="text"
@@ -153,14 +178,20 @@
 			<!-- Submit -->
 			<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
 				<p class="font-display italic text-sm text-base-content/65 leading-snug max-w-sm">
-					Заявка уйдёт мне в Telegram. Отвечу за&nbsp;1–2&nbsp;дня лично.
+					Заявка прилетит мне моментально. Отвечу за&nbsp;1–2&nbsp;дня лично.
 				</p>
 				<button
 					type="submit"
 					disabled={!canSubmit}
 					class="btn-glow bg-primary text-primary-content font-body font-semibold text-base py-4 px-7 hover:bg-base-content transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
 				>
-					{status === "sending" ? "Отправляю…" : "Записаться на пилот"}
+					{#if status === "sending"}
+						Отправляю…
+					{:else if selectedTariff}
+						Записаться на «{selectedTariff}»
+					{:else}
+						Записаться на пилот
+					{/if}
 				</button>
 			</div>
 		</form>

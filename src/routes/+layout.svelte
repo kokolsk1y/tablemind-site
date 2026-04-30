@@ -17,7 +17,7 @@
 </script>
 
 <svelte:head>
-	<title>TableMind — QR-меню с AI для ресторанов</title>
+	<title>TableMind — умное меню: QR или киоск, 12 языков, от 1 990 ₽</title>
 </svelte:head>
 
 <!-- Scroll progress — тонкая охровая полоса сверху -->
